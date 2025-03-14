@@ -28,7 +28,10 @@ public class UserService {
     private final ClockHolder clockHolder;
     private final PasswordEncryption passwordEncryption;
     private final CertificationService certificationService;
-
+    public User getById(UUID userId) {
+        return userRepository.findByUserIdAndStatus(userId, UserStatus.ACTIVE)
+                .orElseThrow(() -> new ResourceNotFoundException("Users", userId));
+    }
     @Transactional
     public User create(UserCreate userCreate) {
         User user = User.from(userCreate, uuidHolder, clockHolder, passwordEncryption);
@@ -54,5 +57,6 @@ public class UserService {
 
         userRepository.updateUserStatus(userId, UserStatus.ACTIVE);
     }
+
 
 }

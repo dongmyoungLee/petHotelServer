@@ -17,4 +17,5 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, UUID> {
     void updateUserStatus(@Param("userId") UUID userId, @Param("status") UserStatus status);
 
     Optional<UserEntity> findByUserIdAndStatus(UUID userId, UserStatus userStatus);
+
 }

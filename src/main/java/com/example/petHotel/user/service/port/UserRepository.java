@@ -15,4 +15,5 @@ public interface UserRepository {
     void updateUserStatus(UUID userId,UserStatus status);
     Optional<User> findByUserIdAndStatus(UUID userId, UserStatus userStatus);
 
+
 }

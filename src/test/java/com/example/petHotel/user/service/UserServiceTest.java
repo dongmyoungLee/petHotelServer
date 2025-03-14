@@ -1,5 +1,7 @@
 package com.example.petHotel.user.service;
 
+import com.example.petHotel.common.domain.exception.CertificationCodeNotMatchedException;
+import com.example.petHotel.common.domain.exception.DuplicateDataException;
 import com.example.petHotel.user.domain.Role;
 import com.example.petHotel.user.domain.User;
 import com.example.petHotel.user.domain.UserCreate;
@@ -13,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class UserServiceTest {
     private UserService userService;
@@ -31,7 +34,8 @@ public class UserServiceTest {
                 .passwordEncryption(new TestPasswordEncryption(new BCryptPasswordEncoder()))
                 .build();
 
-        fakeUserRepository.save(User.builder()
+        User save = fakeUserRepository.save(User.builder()
+                .userId(UUID.fromString("ce670844-46bb-4f12-883a-810510bf5dae"))
                 .userEmail("pajang1515@daum.net")
                 .userPwd(passwordEncryption.encryptPassword("1234"))
                 .userName("dm")
@@ -43,7 +47,9 @@ public class UserServiceTest {
                 .certificationCode("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
                 .build());
 
+
         fakeUserRepository.save(User.builder()
+                .userId(UUID.fromString("ce670844-46bb-4f12-883a-810510bf5dac"))
                 .userEmail("pajang1516@daum.net")
                 .userPwd(passwordEncryption.encryptPassword("1234"))
                 .userName("dm2")
@@ -54,6 +60,7 @@ public class UserServiceTest {
                 .userRegistrationDate(0L)
                 .certificationCode("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaab")
                 .build());
+
     }
 
 
@@ -86,12 +93,38 @@ public class UserServiceTest {
     void PENDING_상태의_사용자는_인증_코드로_ACTIVE_시킬_수_있다() {
         // given
 
-        // when
-//        userService.verifyEmail("TEST", "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-//
-//        // then
-//        User user = userServiceImpl.getById(1);
+        // when -> 로직을 수정해야할 필요가 있는 듯 함..
+
+//        userService.verifyEmail(UUID.fromString("ce670844-46bb-4f12-883a-810510bf5dae"), "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+
+        // then
+//        User user = userService.getById(UUID.fromString("ce670844-46bb-4f12-883a-810510bf5dae"));
 //
 //        Assertions.assertThat(user.getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
+    void Active_인_유저는_에러를_던진다() {
+        // given
+
+        // when
+
+
+        // then
+        assertThatThrownBy(() -> {
+            userService.verifyEmail(UUID.fromString("ce670844-46bb-4f12-883a-810510bf5dac"), "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+        }).isInstanceOf(DuplicateDataException.class);
+    }
+
+    @Test
+    void PENDING_상태의_사용자는_잘못된_인증_코드를_받으면_에러를_던진다() {
+        // given
+
+        // when
+
+        // then
+        assertThatThrownBy(() -> {
+            userService.verifyEmail(UUID.fromString("ce670844-46bb-4f12-883a-810510bf5dae"), "aaaaaaaa");
+        }).isInstanceOf(CertificationCodeNotMatchedException.class);
     }
 }

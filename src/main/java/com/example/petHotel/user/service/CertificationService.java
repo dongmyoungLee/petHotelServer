@@ -2,15 +2,19 @@ package com.example.petHotel.user.service;
 
 import com.example.petHotel.user.service.port.MailSender;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@EnableAsync
 public class CertificationService {
     private final MailSender mailSender;
 
+    @Async
     public void send(String email, UUID userId, String certificationCode) {
         String CertificationUrl = generateCertificationUrl(userId, certificationCode);
         String title = "Please certify your email address";
@@ -21,6 +25,6 @@ public class CertificationService {
     }
 
     public String generateCertificationUrl(UUID userId, String certificationCode) {
-        return "http://localhost:8080/api/users/" + userId + "/verify?certificationCode=" + certificationCode;
+        return "http://localhost:4000/api/users/" + userId + "/verify?certificationCode=" + certificationCode;
     }
 }

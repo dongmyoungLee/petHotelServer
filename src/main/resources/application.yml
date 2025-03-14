@@ -13,6 +13,6 @@ spring:
       ddl-auto: update
     show-sql: true
   config:
-    import: mail-secret.yml
+    import: secrets.yml
 
 

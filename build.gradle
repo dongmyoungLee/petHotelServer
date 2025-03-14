@@ -41,6 +41,12 @@ dependencies {
 
 	// java sender mail
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//test 추가
+	annotationProcessor 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {

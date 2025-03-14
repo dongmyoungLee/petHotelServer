@@ -95,12 +95,12 @@ public class UserServiceTest {
 
         // when -> 로직을 수정해야할 필요가 있는 듯 함..
 
-//        userService.verifyEmail(UUID.fromString("ce670844-46bb-4f12-883a-810510bf5dae"), "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+        userService.verifyEmail(UUID.fromString("ce670844-46bb-4f12-883a-810510bf5dae"), "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
         // then
-//        User user = userService.getById(UUID.fromString("ce670844-46bb-4f12-883a-810510bf5dae"));
-//
-//        Assertions.assertThat(user.getStatus()).isEqualTo(UserStatus.ACTIVE);
+        User user = userService.getById(UUID.fromString("ce670844-46bb-4f12-883a-810510bf5dae"));
+
+        Assertions.assertThat(user.getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
 
     @Test

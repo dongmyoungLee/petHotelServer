@@ -1,5 +1,6 @@
 package com.example.petHotel.user.domain;
 
+import com.example.petHotel.common.domain.exception.CertificationCodeNotMatchedException;
 import com.example.petHotel.common.service.ClockHolder;
 import com.example.petHotel.common.service.UuidHolder;
 import com.example.petHotel.user.service.port.PasswordEncryption;
@@ -36,6 +37,26 @@ public class User {
                 .userRegistrationDate(clockHolder.millis())
                 .certificationCode(uuidHolder.random())
                 .build();
+    }
+
+    public User certificate(String certificationCode) {
+        if (!this.certificationCode.equals(certificationCode)) {
+            throw new CertificationCodeNotMatchedException();
+        }
+
+        return User.builder()
+                .userId(userId)
+                .userEmail(userEmail)
+                .userPwd(userPwd)
+                .userName(userName)
+                .userPhone(userPhone)
+                .userAddr(userAddr)
+                .role(role)
+                .status(UserStatus.ACTIVE)
+                .userRegistrationDate(userRegistrationDate)
+                .certificationCode(certificationCode)
+                .build();
+
     }
 
 

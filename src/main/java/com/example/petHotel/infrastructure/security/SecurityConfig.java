@@ -33,7 +33,7 @@ public class SecurityConfig {
                 , UsernamePasswordAuthenticationFilter.class);
         security.authorizeHttpRequests(req ->
                 req.requestMatchers(
-                        AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/users/signup")
+                        AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/users")
                 )
                         .permitAll()
                         .anyRequest().authenticated()

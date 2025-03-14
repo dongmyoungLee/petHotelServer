@@ -1,7 +1,6 @@
 package com.example.petHotel.infrastructure.security;
 
-import com.example.petHotel.user.entities.UserEntity;
-import com.example.petHotel.user.service.domain.User;
+import com.example.petHotel.user.domain.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -40,13 +39,13 @@ public class JwtService {
      */
     public String makeToken(User user, String flag){
         Map<String, Object> claims = new HashMap<>();
-        claims.put("id", user.getId().toString());
+        claims.put("id", user.getUserId().toString());
         claims.put("name", user.getUserName());
         claims.put("email", user.getUserEmail());
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(user.getId().toString())
+                .setSubject(user.getUserId().toString())
                 .setExpiration(
                         flag.equals("access") ?
                                 new Date(System.currentTimeMillis() + (1000L * 60 * 30)) : // 액세스 토큰(30분 유효)

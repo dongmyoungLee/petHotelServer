@@ -2,11 +2,11 @@ package com.example.petHotel.user.domain;
 
 import com.example.petHotel.common.service.ClockHolder;
 import com.example.petHotel.common.service.UuidHolder;
+import com.example.petHotel.user.service.port.PasswordEncryption;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -24,10 +24,10 @@ public class User {
     private long userRegistrationDate;
     private String certificationCode;
 
-    public static User from(UserCreate userCreate, UuidHolder uuidHolder, ClockHolder clockHolder) {
+    public static User from(UserCreate userCreate, UuidHolder uuidHolder, ClockHolder clockHolder, PasswordEncryption passwordEncryption) {
         return User.builder()
                 .userEmail(userCreate.getUserEmail())
-                .userPwd(userCreate.getUserPwd())
+                .userPwd(passwordEncryption.encryptPassword(userCreate.getUserPwd()))
                 .userName(userCreate.getUserName())
                 .userPhone(userCreate.getUserPhone())
                 .userAddr(userCreate.getUserAddr())
@@ -37,4 +37,6 @@ public class User {
                 .certificationCode(uuidHolder.random())
                 .build();
     }
+
+
 }

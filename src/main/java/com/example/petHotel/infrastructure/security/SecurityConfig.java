@@ -33,7 +33,8 @@ public class SecurityConfig {
                 , UsernamePasswordAuthenticationFilter.class);
         security.authorizeHttpRequests(req ->
                 req.requestMatchers(
-                        AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/users")
+                        AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/users"),
+                                AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/v1/users/**/verify")
                 )
                         .permitAll()
                         .anyRequest().authenticated()

@@ -1,0 +1,35 @@
+server:
+  port: 4000
+
+spring:
+  application:
+    name: petHotel
+  datasource:
+    url: jdbc:mysql://localhost:3306/pet-hotel?serverTimezone=Asia/Seoul
+    username: root
+    password: ROQKFdlehdaud12!@
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  config:
+    import: mail-secret.yml
+#  mail:
+#    host: smtp.gmail.com
+#    port: 587
+#    username: ${MAIL_USERNAME}
+#    password: ${MAIL_APPLICATION_PASSWORD}
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          timeout: 5000
+#          starttls:
+#            enable: true
+
+
+
+jwt:
+  secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa
+
+

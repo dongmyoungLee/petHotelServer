@@ -38,14 +38,6 @@ public class FakeUserRepository implements UserRepository {
         }
     }
 
-    @Override
-    public void updateUserStatus(UUID userId, UserStatus status) {
-        // 실제로직 변경이 필요할 것 같음..
-//        data.stream()
-//                .filter(user -> user.getUserId().equals(userId))
-//                .findFirst()
-//                .ifPresent(user -> user.setStatus(status));
-    }
 
     @Override
     public Optional<User> findByUserIdAndStatus(UUID userId, UserStatus userStatus) {

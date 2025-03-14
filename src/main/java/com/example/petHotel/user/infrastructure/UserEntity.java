@@ -21,7 +21,7 @@ public class UserEntity {
     @Column(name = "user_id", nullable = false, updatable = false)
     private UUID userId;
 
-    @Column(name = "user_email", nullable = false, unique = true)
+    @Column(name = "user_email", nullable = false)
     private String userEmail;
 
     @Column(name = "user_pwd", nullable = false)
@@ -67,6 +67,7 @@ public class UserEntity {
 
     public static UserEntity fromModel(User user) {
         UserEntity userEntity = new UserEntity();
+        userEntity.userId = user.getUserId();
         userEntity.userEmail = user.getUserEmail();
         userEntity.userPwd = user.getUserPwd();
         userEntity.userName = user.getUserName();

@@ -28,15 +28,16 @@ public class UserService {
     private final ClockHolder clockHolder;
     private final PasswordEncryption passwordEncryption;
     private final CertificationService certificationService;
+
     public User getById(UUID userId) {
         return userRepository.findByUserIdAndStatus(userId, UserStatus.ACTIVE)
                 .orElseThrow(() -> new ResourceNotFoundException("Users", userId));
     }
+
     @Transactional
     public User create(UserCreate userCreate) {
         User user = User.from(userCreate, uuidHolder, clockHolder, passwordEncryption);
         user = userRepository.save(user);
-
         certificationService.send(userCreate.getUserEmail(), user.getUserId(), user.getCertificationCode());
 
         return user;
@@ -50,12 +51,9 @@ public class UserService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("가입된 유저가 없습니다.", userId));
 
+        user = user.certificate(certificationCode);
 
-        if (!user.getCertificationCode().equals(certificationCode)) {
-            throw new CertificationCodeNotMatchedException();
-        }
-
-        userRepository.updateUserStatus(userId, UserStatus.ACTIVE);
+        userRepository.save(user);
     }
 
 

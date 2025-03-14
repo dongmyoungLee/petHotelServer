@@ -11,10 +11,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserJpaRepository extends JpaRepository<UserEntity, UUID> {
-    @Transactional
-    @Modifying
-    @Query("UPDATE UserEntity u SET u.status = :status WHERE u.userId = :userId")
-    void updateUserStatus(@Param("userId") UUID userId, @Param("status") UserStatus status);
 
     Optional<UserEntity> findByUserIdAndStatus(UUID userId, UserStatus userStatus);
 

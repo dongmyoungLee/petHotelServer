@@ -38,4 +38,4 @@ out/
 .vscode/
 
 ## mailConfig
-!mail-config.yml
+src/main/resources/secrets.yml

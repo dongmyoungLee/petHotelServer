@@ -1,6 +1,7 @@
 package com.example.petHotel.user.service;
 
 import com.example.petHotel.common.domain.exception.CertificationCodeNotMatchedException;
+import com.example.petHotel.common.domain.exception.DuplicateDataException;
 import com.example.petHotel.common.domain.exception.ResourceNotFoundException;
 import com.example.petHotel.common.service.ClockHolder;
 import com.example.petHotel.common.service.UuidHolder;
@@ -33,7 +34,13 @@ public class UserService {
     }
     @Transactional
     public void verifyEmail(UUID userId, String certificationCode) {
+
+        userRepository.findByUserIdAndStatus(userId, UserStatus.ACTIVE).ifPresent(user -> {
+                    throw new DuplicateDataException();
+                });
+
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("가입된 유저가 없습니다.", userId));
+
 
         if (!user.getCertificationCode().equals(certificationCode)) {
             throw new CertificationCodeNotMatchedException();

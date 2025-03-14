@@ -30,5 +30,10 @@ public class UserRepositoryImpl implements UserRepository {
         userJpaRepository.updateUserStatus(userId, status);
     }
 
+    @Override
+    public Optional<User> findByUserIdAndStatus(UUID userId, UserStatus userStatus) {
+        return userJpaRepository.findByUserIdAndStatus(userId, userStatus).map(UserEntity::toModel);
+    }
+
 
 }

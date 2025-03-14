@@ -25,6 +25,6 @@ public class CertificationService {
     }
 
     public String generateCertificationUrl(UUID userId, String certificationCode) {
-        return "http://localhost:4000/api/users/" + userId + "/verify?certificationCode=" + certificationCode;
+        return "http://localhost:4000/api/v1/users/" + userId + "/verify?certificationCode=" + certificationCode;
     }
 }

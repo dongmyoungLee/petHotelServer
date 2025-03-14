@@ -1,6 +1,7 @@
 package com.example.petHotel.common.controller;
 
 import com.example.petHotel.common.domain.exception.CertificationCodeNotMatchedException;
+import com.example.petHotel.common.domain.exception.DuplicateDataException;
 import com.example.petHotel.common.domain.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.Ordered;
@@ -10,8 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -29,6 +29,13 @@ public class ExceptionControllerAdvice {
     @ResponseStatus(FORBIDDEN)
     @ExceptionHandler(CertificationCodeNotMatchedException.class)
     public String certificationCodeNotMatchedException(CertificationCodeNotMatchedException exception) {
+        return exception.getMessage();
+    }
+
+    @ResponseBody
+    @ResponseStatus(CONFLICT)
+    @ExceptionHandler(DuplicateDataException.class)
+    public String duplicateDataException(DuplicateDataException exception) {
         return exception.getMessage();
     }
 

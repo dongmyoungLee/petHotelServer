@@ -1,4 +1,4 @@
-package com.example.petHotel.infrastructure.security;
+package com.example.petHotel.common.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +22,8 @@ public class TokenInfo implements UserDetails {
     private String name;
     private String email;
     private String role;
-    private String nickName;
+    private LocalDateTime iat;
+    private LocalDateTime exp;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

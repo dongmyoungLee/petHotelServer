@@ -1,4 +1,4 @@
-package com.example.petHotel.common.infrastructure;
+package com.example.petHotel.common.infrastructure.util;
 
 
 import com.example.petHotel.common.service.ClockHolder;

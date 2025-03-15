@@ -1,5 +1,7 @@
 package com.example.petHotel.infrastructure.security;
 
+import com.example.petHotel.common.domain.dto.TokenInfo;
+import com.example.petHotel.common.domain.service.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +17,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvier;
 
     // 요청이 들어올 때마다 실행 되는 필터 메서드
     @Override
@@ -30,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authHeader.replace("Bearer ", "");
 
-        TokenInfo tokenInfo = jwtService.parseToken(token);
+        TokenInfo tokenInfo = jwtProvier.parseToken(token);
 
         if(tokenInfo != null
                 && !tokenInfo.getId().toString().isEmpty() // 토큰의 ID가 비어 있지 않으면 유효한 토큰으로 간주

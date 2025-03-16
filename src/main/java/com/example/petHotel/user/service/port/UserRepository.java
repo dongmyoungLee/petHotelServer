@@ -13,6 +13,5 @@ public interface UserRepository {
     Optional<User> findById(UUID userId);
     User save(User user);
     Optional<User> findByUserIdAndStatus(UUID userId, UserStatus userStatus);
-
-
+    Optional<User> findByUserEmail(String email);
 }

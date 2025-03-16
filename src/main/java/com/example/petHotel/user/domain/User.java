@@ -39,6 +39,7 @@ public class User {
                 .build();
     }
 
+
     public User certificate(String certificationCode) {
         if (!this.certificationCode.equals(certificationCode)) {
             throw new CertificationCodeNotMatchedException();

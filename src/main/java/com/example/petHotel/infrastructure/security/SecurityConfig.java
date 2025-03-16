@@ -34,10 +34,13 @@ public class SecurityConfig {
         security.authorizeHttpRequests(req ->
                 req.requestMatchers(
                         AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/users"),
-                                AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/users/login"),
+                        AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/auth"),
+                        AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/auth/refresh"),
                         AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/v1/users/**/verify")
                 )
                         .permitAll()
+                        // 나중에 ADMIN 사용할때.. 테스트 양식
+                        .requestMatchers("/api/v1/auth/test2").hasRole("ADMIN")
                         .anyRequest().authenticated()
         );
         return security.build();

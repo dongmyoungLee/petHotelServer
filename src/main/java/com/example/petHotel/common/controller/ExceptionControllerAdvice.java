@@ -3,6 +3,7 @@ package com.example.petHotel.common.controller;
 import com.example.petHotel.common.domain.exception.CertificationCodeNotMatchedException;
 import com.example.petHotel.common.domain.exception.DuplicateDataException;
 import com.example.petHotel.common.domain.exception.ResourceNotFoundException;
+import com.example.petHotel.common.domain.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -39,4 +40,10 @@ public class ExceptionControllerAdvice {
         return exception.getMessage();
     }
 
+    @ResponseBody
+    @ResponseStatus(UNAUTHORIZED)
+    @ExceptionHandler(UnauthorizedException.class)
+    public String unauthorizedException(UnauthorizedException exception) {
+        return exception.getMessage();
+    }
 }

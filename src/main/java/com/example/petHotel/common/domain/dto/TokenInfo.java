@@ -22,12 +22,10 @@ public class TokenInfo implements UserDetails {
     private String name;
     private String email;
     private String role;
-    private LocalDateTime iat;
-    private LocalDateTime exp;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
     @Override

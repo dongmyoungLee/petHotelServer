@@ -1,15 +1,20 @@
 package com.example.petHotel.common.infrastructure.jwt;
 
 import com.example.petHotel.common.domain.dto.TokenInfo;
+import com.example.petHotel.common.domain.exception.UnauthorizedException;
 import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.user.domain.User;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,15 +25,19 @@ public class JwtProviderImpl implements JwtProvider {
     @Value("${jwt.secret}")
     private String secret;
 
-
-    /**
-     * JWT 토큰 생성 메서드
-     * @param user - 토큰에 포함할 사용자 정보
-     * @param flag - "access"(액세스 토큰) 또는 "refresh"(리프레시 토큰) 구분 값
-     * @return 생성된 JWT 토큰 문자열
-     */
     @Override
-    public String generateToken(User user, String flag) {
+    public String generateAccessToken(User user) {
+        return generateToken(user, 1000L * 60 * 2); // 1분 유효
+//        return generateToken(user, 1000L * 60 * 30); // 30분 유효
+    }
+
+    @Override
+    public String generateRefreshToken(User user) {
+        return generateToken(user, 1000L * 60 * 60 * 24 * 7); // 7일 유효
+    }
+
+    @Override
+    public String generateToken(User user, long expirationMillis) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getUserId().toString());
         claims.put("name", user.getUserName());
@@ -37,13 +46,7 @@ public class JwtProviderImpl implements JwtProvider {
 
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-
-        Date expiration;
-        if (flag.equals("access")) {
-            expiration = new Date(nowMillis + (1000L * 60 * 30)); // 액세스 토큰(30분 유효)
-        } else {
-            expiration = new Date(nowMillis + (1000L * 60 * 60 * 24 * 7)); // 리프레시 토큰(7일 유효)
-        }
+        Date expiration = new Date(nowMillis + expirationMillis);
 
         claims.put("iat", nowMillis / 1000); // 발급 시간 (초 단위)
         claims.put("exp", expiration.getTime() / 1000); // 만료 시간 (초 단위)
@@ -51,10 +54,8 @@ public class JwtProviderImpl implements JwtProvider {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(user.getUserId().toString())
-                .setExpiration(
-                        flag.equals("access") ?
-                                new Date(System.currentTimeMillis() + (1000L * 60 * 30)) : // 액세스 토큰(30분 유효)
-                                new Date(System.currentTimeMillis() + (1000L * 60 * 60 * 24 * 7))) // 리프레시 토큰(7일 유효)
+                .setIssuedAt(now) // 발급 시간
+                .setExpiration(expiration) // 만료 시간
                 .signWith(SignatureAlgorithm.HS256, secret.getBytes())
                 .compact();
     }
@@ -66,72 +67,128 @@ public class JwtProviderImpl implements JwtProvider {
      */
     @Override
     public TokenInfo parseToken(String token) {
-        Claims body = (Claims) Jwts.parserBuilder()
-                .setSigningKey(secret.getBytes())
-                .build()
-                .parse(token)
-                .getBody();
+        try {
+            Claims body = (Claims) Jwts.parserBuilder()
+                    .setSigningKey(secret.getBytes())
+                    .build()
+                    .parse(token)
+                    .getBody();
 
-        return TokenInfo.builder()
-                .id(UUID.fromString(body.get("id", String.class)))
-                .name(body.get("name", String.class))
-                .email(body.get("email", String.class))
-                .role(body.get("role", String.class))
-                .build();
+            return TokenInfo.builder()
+                    .id(UUID.fromString(body.get("id", String.class)))
+                    .name(body.get("name", String.class))
+                    .email(body.get("email", String.class))
+                    .role(body.get("role", String.class))
+                    .build();
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰
+            throw new UnauthorizedException("The access token has expired. Please refresh your token.");
+        } catch (JwtException | IllegalArgumentException e) {
+            // 잘못된 토큰
+            throw new UnauthorizedException("Invalid token. Please check your access token.");
+        }
+
     }
 
-    /**
-     * JWT 토큰의 만료 여부를 확인하는 메서드
-     * @param token - 검증할 JWT
-     * @return true: 만료됨 / false: 유효함
-     */
     @Override
-    public boolean isTokenExpired(String token) {
-        try {
-            Claims claims = getClaims(token);
-            Date expirationDate = claims.getExpiration();
+    public void addTokenToCookies(HttpServletResponse response, String accessToken, String refreshToken) {
+        // Access Token을 쿠키에 설정 (HttpOnly, Secure, SameSite)
+        Cookie accessCookie = new Cookie("access_token", accessToken);
 
-            return expirationDate.before(new Date());
-        } catch (Exception e) {
-            // If there's an exception, the token is considered expired
-            return true;
+        accessCookie.setHttpOnly(true);
+        //accessCookie.setSecure(true);
+        accessCookie.setPath("/");
+        accessCookie.setMaxAge(1000 * 60 * 30);
+        accessCookie.setDomain("localhost");
+        accessCookie.setAttribute("SameSite", "Lax");
+
+        // Refresh Token을 쿠키에 설정 (HttpOnly, Secure, SameSite)
+        Cookie refreshCookie = new Cookie("refresh_token", refreshToken);
+
+        refreshCookie.setHttpOnly(true);
+        //refreshCookie.setSecure(true);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(1000 * 60 * 60 * 24 * 7);
+        refreshCookie.setDomain("localhost");
+        refreshCookie.setAttribute("SameSite", "Lax");
+
+        // 쿠키를 응답에 추가
+        response.addCookie(accessCookie);
+        response.addCookie(refreshCookie);
+    }
+
+    @Override
+    public void clearTokensCookie(HttpServletResponse response) {
+        // 리프레시 토큰 삭제
+        Cookie refreshTokenCookie = new Cookie("refresh_token", null);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(0);
+        response.addCookie(refreshTokenCookie);
+
+        // 엑세스 토큰 삭제
+        Cookie accessTokenCookie = new Cookie("access_token", null);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(0);
+        response.addCookie(accessTokenCookie);
+    }
+
+    @Override
+    public void addAccessTokenToCookie(HttpServletResponse response, String accessToken) {
+        Cookie accessTokenCookie = new Cookie("access_token", accessToken);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(60 * 30);
+        accessTokenCookie.setDomain("localhost");
+        accessTokenCookie.setAttribute("SameSite", "Lax");
+        response.addCookie(accessTokenCookie);
+    }
+
+    @Override
+    public String getCookieValue(HttpServletRequest request, String cookieName) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(cookieName)) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public UUID getUserIdFromRefreshToken(String refreshToken) {
+        try {
+            // JWT 토큰에서 클레임 파싱
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secret.getBytes())
+                    .build()
+                    .parseClaimsJws(refreshToken)
+                    .getBody();
+
+            // 클레임에서 userId 추출하고 UUID로 변환
+            String userId = claims.get("id", String.class);
+            return UUID.fromString(userId);
+        } catch (JwtException e) {
+            throw new IllegalArgumentException("Invalid or expired JWT token", e);
         }
     }
 
-    /**
-     * 새로운 액세스 토큰을 생성하는 메서드
-     * @param claims - 기존 토큰에서 추출한 사용자 정보
-     * @return 새롭게 생성된 액세스 토큰
-     */
     @Override
-    public String generateNewAccessToken(Map<String, Object> claims) {
-        SecretKeySpec key = getSecretKeySpec();
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(new Date(System.currentTimeMillis() + 1800_000)) // 30분
-                .signWith(key)
-                .compact();
-    }
-
-    // 시크릿 키를 생성하는 메서드 (HMAC-SHA384 알고리즘 사용)
-    private SecretKeySpec getSecretKeySpec() {
-        SignatureAlgorithm hs384 = SignatureAlgorithm.HS384;
-        SecretKeySpec key = new SecretKeySpec(secret.getBytes(), hs384.getJcaName());
-        return key;
-    }
-
-
-    /**
-     * JWT에서 클레임(Claims) 정보를 가져오는 메서드
-     * @param token - JWT
-     * @return Claims - JWT의 데이터(페이로드)
-     */
-    private Claims getClaims(String token) {
-        return  Jwts.parserBuilder()
-                .setSigningKey(secret.getBytes())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(secret.getBytes())
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }

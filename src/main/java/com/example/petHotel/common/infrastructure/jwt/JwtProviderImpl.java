@@ -27,7 +27,7 @@ public class JwtProviderImpl implements JwtProvider {
 
     @Override
     public String generateAccessToken(User user) {
-        return generateToken(user, 1000L * 60 * 2); // 1분 유효
+        return generateToken(user, 1000L * 60 * 30); // 30분 유효
 //        return generateToken(user, 1000L * 60 * 30); // 30분 유효
     }
 

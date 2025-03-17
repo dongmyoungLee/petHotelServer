@@ -94,19 +94,4 @@ public class UserService {
 
         return jwtProvider.generateAccessToken(user);
     }
-
-//    public TokenResponse refreshAccessToken(String refreshToken) {
-//        Long userId = jwtProvider.validateRefreshToken(refreshToken);
-//        RefreshToken storedToken = refreshTokenRepository.findByUserId(userId)
-//                .orElseThrow(() -> new UnauthorizedException("Refresh Token이 존재하지 않습니다."));
-//
-//        if (!storedToken.getToken().equals(refreshToken)) {
-//            throw new UnauthorizedException("유효하지 않은 Refresh Token입니다.");
-//        }
-//
-//        String newAccessToken = jwtProvider.generateAccessToken(userId);
-//        return new TokenResponse(newAccessToken);
-//    }
-
-
 }

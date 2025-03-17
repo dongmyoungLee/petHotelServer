@@ -2,14 +2,16 @@ package com.example.petHotel.user.service;
 
 import com.example.petHotel.common.domain.exception.CertificationCodeNotMatchedException;
 import com.example.petHotel.common.domain.exception.DuplicateDataException;
-import com.example.petHotel.user.domain.Role;
-import com.example.petHotel.user.domain.User;
-import com.example.petHotel.user.domain.UserCreate;
-import com.example.petHotel.user.domain.UserStatus;
+import com.example.petHotel.common.domain.exception.ResourceNotFoundException;
+import com.example.petHotel.common.domain.service.JwtProvider;
+import com.example.petHotel.common.mock.FakeJwtProvider;
+import com.example.petHotel.user.domain.*;
 import com.example.petHotel.user.mock.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.UUID;
@@ -19,19 +21,24 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class UserServiceTest {
     private UserService userService;
+    private FakeJwtProvider jwtProvider;
 
     @BeforeEach
     void init() {
         FakeMailSender fakeMailSender = new FakeMailSender();
         FakeUserRepository fakeUserRepository = new FakeUserRepository();
+        FakeRefreshTokenRepository fakeRefreshTokenRepository = new FakeRefreshTokenRepository();
         TestPasswordEncryption passwordEncryption = new TestPasswordEncryption(new BCryptPasswordEncoder());
+        jwtProvider = new FakeJwtProvider();
 
         this.userService = UserService.builder()
                 .userRepository(fakeUserRepository)
+                .refreshTokenRepository(fakeRefreshTokenRepository)
                 .certificationService(new CertificationService(fakeMailSender))
                 .clockHolder(new TestClockHolder(1678530673958L))
                 .uuidHolder(new TestUuidHolder("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))
                 .passwordEncryption(new TestPasswordEncryption(new BCryptPasswordEncoder()))
+                .jwtProvider(jwtProvider)
                 .build();
 
         User save = fakeUserRepository.save(User.builder()
@@ -128,5 +135,86 @@ public class UserServiceTest {
         }).isInstanceOf(CertificationCodeNotMatchedException.class);
     }
 
+    @Test
+    void 존재하지_않는_ID로_유저를_조회하면_예외를_던진다() {
+        // given
+        UUID userId = UUID.randomUUID();
+
+        // when & then
+        assertThatThrownBy(() -> userService.getById(userId))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void 올바른_이메일과_비밀번호로_로그인할_수_있다() {
+        // given
+        String email = "pajang1515@daum.net";
+        String password = "1234";
+
+        // when
+        UserToken userToken = userService.login(email, password);
+
+        // then
+        assertThat(userToken.getAccessToken()).isNotNull();
+        assertThat(userToken.getRefreshToken()).isNotNull();
+        assertThat(userToken.getEmail()).isEqualTo(email);
+    }
+
+    @Test
+    void 존재하지_않는_이메일로_로그인하면_예외를_던진다() {
+        // given
+        String email = "nonexistent@daum.net";
+        String password = "1234";
+
+        // when & then
+        assertThatThrownBy(() -> userService.login(email, password))
+                .isInstanceOf(UsernameNotFoundException.class);
+    }
+
+    @Test
+    void 잘못된_비밀번호로_로그인하면_예외를_던진다() {
+        // given
+        String email = "pajang1515@daum.net";
+        String wrongPassword = "wrong_password";
+
+        // when & then
+        assertThatThrownBy(() -> userService.login(email, wrongPassword))
+                .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void 유효한_리프레시_토큰으로_새로운_엑세스_토큰을_발급할_수_있다() {
+        // given
+        User user = User.builder()
+                .userId(UUID.fromString("ce670844-46bb-4f12-883a-810510bf5dac"))
+                .userEmail("pajang1516@daum.net")
+                .userPwd("1234")
+                .userName("dm2")
+                .userPhone("01034563456")
+                .userAddr("서울")
+                .role(Role.CUSTOMER)
+                .status(UserStatus.ACTIVE)
+                .userRegistrationDate(0L)
+                .certificationCode("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaab")
+                .build();
+
+        String refreshToken = jwtProvider.generateRefreshToken(user);
+
+        // when
+        String newAccessToken = userService.refreshAccessToken(refreshToken, null);
+
+        // then
+        assertThat(newAccessToken).isNotNull();
+    }
+
+    @Test
+    void 잘못된_리프레시_토큰으로_엑세스_토큰_갱신하면_예외를_던진다() {
+        // given
+        String invalidRefreshToken = "invalid_token";
+
+        // when & then
+        assertThatThrownBy(() -> userService.refreshAccessToken(invalidRefreshToken, null))
+                .isInstanceOf(UsernameNotFoundException.class);
+    }
 
 }

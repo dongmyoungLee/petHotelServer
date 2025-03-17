@@ -127,4 +127,6 @@ public class UserServiceTest {
             userService.verifyEmail(UUID.fromString("ce670844-46bb-4f12-883a-810510bf5dae"), "aaaaaaaa");
         }).isInstanceOf(CertificationCodeNotMatchedException.class);
     }
+
+
 }

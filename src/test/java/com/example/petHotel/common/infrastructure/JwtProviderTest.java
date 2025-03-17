@@ -7,16 +7,18 @@ import com.example.petHotel.common.infrastructure.jwt.JwtProviderImpl;
 import com.example.petHotel.user.domain.Role;
 import com.example.petHotel.user.domain.User;
 import com.example.petHotel.user.domain.UserStatus;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.UUID;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 
 public class JwtProviderTest {
     private JwtProvider jwtProvider;
@@ -146,5 +148,59 @@ public class JwtProviderTest {
                         && cookie.getMaxAge() == 0
                         && cookie.getValue() == null
         ));
+    }
+
+    @Test
+    void addTokenToCookies_토큰을_쿠키에_정상적으로_추가해야한다() {
+        // given
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        String accessToken = "testAccessToken";
+        String refreshToken = "testRefreshToken";
+
+        // when
+        jwtProvider.addTokenToCookies(response, accessToken, refreshToken);
+
+        // then
+        assertThat(response.getCookies())
+                .extracting(Cookie::getName, Cookie::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("access_token", accessToken),
+                        tuple("refresh_token", refreshToken)
+                );
+    }
+
+    @Test
+    void addAccessTokenToCookie_엑세스_토큰을_쿠키에_추가해야한다() {
+        // given
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        String accessToken = "testAccessToken";
+
+        // when
+        jwtProvider.addAccessTokenToCookie(response, accessToken);
+
+        // then
+        assertThat(response.getCookies())
+                .extracting(Cookie::getName, Cookie::getValue)
+                .containsExactly(tuple("access_token", accessToken));
+    }
+
+    @Test
+    void getCookieValue_올바른_쿠키값을_반환해야한다() {
+        // given
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setCookies(
+                new Cookie("access_token", "testAccessToken"),
+                new Cookie("refresh_token", "testRefreshToken")
+        );
+
+        // when
+        String accessToken = jwtProvider.getCookieValue(request, "access_token");
+        String refreshToken = jwtProvider.getCookieValue(request, "refresh_token");
+        String invalidToken = jwtProvider.getCookieValue(request, "invalid_token");
+
+        // then
+        assertThat(accessToken).isEqualTo("testAccessToken");
+        assertThat(refreshToken).isEqualTo("testRefreshToken");
+        assertThat(invalidToken).isNull();
     }
 }

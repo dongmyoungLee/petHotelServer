@@ -4,10 +4,7 @@ server:
 spring:
   application:
     name: petHotel
-  datasource:
-    url: jdbc:mysql://localhost:3306/pet-hotel?serverTimezone=Asia/Seoul
-    username: root
-    password: ROQKFdlehdaud12!@
+
   jpa:
     hibernate:
       ddl-auto: update

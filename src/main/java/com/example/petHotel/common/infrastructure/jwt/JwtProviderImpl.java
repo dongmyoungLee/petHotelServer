@@ -5,20 +5,18 @@ import com.example.petHotel.common.domain.exception.UnauthorizedException;
 import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.user.domain.User;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.spec.SecretKeySpec;
-import java.security.Key;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+
 
 @Service
 public class JwtProviderImpl implements JwtProvider {
@@ -28,7 +26,6 @@ public class JwtProviderImpl implements JwtProvider {
     @Override
     public String generateAccessToken(User user) {
         return generateToken(user, 1000L * 60 * 30); // 30분 유효
-//        return generateToken(user, 1000L * 60 * 30); // 30분 유효
     }
 
     @Override
@@ -96,23 +93,24 @@ public class JwtProviderImpl implements JwtProvider {
         Cookie accessCookie = new Cookie("access_token", accessToken);
 
         accessCookie.setHttpOnly(true);
-        //accessCookie.setSecure(true);
+        accessCookie.setSecure(false);
         accessCookie.setPath("/");
         accessCookie.setMaxAge(1000 * 60 * 30);
         accessCookie.setDomain("localhost");
         accessCookie.setAttribute("SameSite", "Lax");
 
-        // Refresh Token을 쿠키에 설정 (HttpOnly, Secure, SameSite)
+
         Cookie refreshCookie = new Cookie("refresh_token", refreshToken);
 
         refreshCookie.setHttpOnly(true);
-        //refreshCookie.setSecure(true);
+        refreshCookie.setSecure(false);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(1000 * 60 * 60 * 24 * 7);
         refreshCookie.setDomain("localhost");
         refreshCookie.setAttribute("SameSite", "Lax");
 
-        // 쿠키를 응답에 추가
+
+
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
     }

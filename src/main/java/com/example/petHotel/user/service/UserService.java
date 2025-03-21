@@ -74,7 +74,7 @@ public class UserService {
         String refreshToken = jwtProvider.generateRefreshToken(user);
 
         // Refresh Token을 DB에 저장 (이전 토큰 무효화 가능)
-        refreshTokenRepository.save(RefreshToken.builder().userId(user.getUserId()).token(refreshToken).build());
+//        refreshTokenRepository.save(RefreshToken.builder().userId(user.getUserId()).token(refreshToken).build());
 
         return UserToken.builder()
                 .accessToken(accessToken)

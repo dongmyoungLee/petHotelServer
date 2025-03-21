@@ -3,10 +3,9 @@ package com.example.petHotel.infrastructure.security;
 import com.example.petHotel.common.domain.dto.TokenInfo;
 import com.example.petHotel.common.domain.exception.UnauthorizedException;
 import com.example.petHotel.common.domain.service.JwtProvider;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +24,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 요청이 들어올 때마다 실행 되는 필터 메서드
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        System.out.println("쿠키 목록:");
+
+        try {
+            for (Cookie cookie : request.getCookies()) {
+                System.out.println("쿠키 이름: " + cookie.getName() + ", 값: " + cookie.getValue());
+            }
+
+        } catch (Exception e) {
+
+        }
+
+
         String authHeader = request.getHeader("Authorization");
 
         if(authHeader == null || !authHeader.startsWith("Bearer ")){
@@ -54,20 +65,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-//        if(tokenInfo != null
-//                && !tokenInfo.getId().toString().isEmpty() // 토큰의 ID가 비어 있지 않으면 유효한 토큰으로 간주
-//                && SecurityContextHolder.getContext().getAuthentication() == null
-//        ){
-//            UsernamePasswordAuthenticationToken authToken =
-//                    new UsernamePasswordAuthenticationToken(
-//                            tokenInfo,
-//                            null,
-//                            tokenInfo.getAuthorities()
-//                    );
-//
-//
-//            SecurityContextHolder.getContext().setAuthentication(authToken);
-//        }
-
     }
 }

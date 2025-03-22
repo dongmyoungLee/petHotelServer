@@ -5,20 +5,18 @@ import com.example.petHotel.common.domain.exception.UnauthorizedException;
 import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.user.domain.User;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.spec.SecretKeySpec;
-import java.security.Key;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+
 
 @Service
 public class JwtProviderImpl implements JwtProvider {
@@ -28,7 +26,6 @@ public class JwtProviderImpl implements JwtProvider {
     @Override
     public String generateAccessToken(User user) {
         return generateToken(user, 1000L * 60 * 30); // 30분 유효
-//        return generateToken(user, 1000L * 60 * 30); // 30분 유효
     }
 
     @Override
@@ -96,25 +93,46 @@ public class JwtProviderImpl implements JwtProvider {
         Cookie accessCookie = new Cookie("access_token", accessToken);
 
         accessCookie.setHttpOnly(true);
-        //accessCookie.setSecure(true);
+        accessCookie.setSecure(false);
         accessCookie.setPath("/");
         accessCookie.setMaxAge(1000 * 60 * 30);
         accessCookie.setDomain("localhost");
         accessCookie.setAttribute("SameSite", "Lax");
 
-        // Refresh Token을 쿠키에 설정 (HttpOnly, Secure, SameSite)
+
         Cookie refreshCookie = new Cookie("refresh_token", refreshToken);
 
         refreshCookie.setHttpOnly(true);
-        //refreshCookie.setSecure(true);
+        refreshCookie.setSecure(false);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(1000 * 60 * 60 * 24 * 7);
         refreshCookie.setDomain("localhost");
         refreshCookie.setAttribute("SameSite", "Lax");
 
-        // 쿠키를 응답에 추가
+
+
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
+//
+//
+//        // 모바일테스트
+//
+//        Cookie accessCookieIp = new Cookie("access_token", accessToken);
+//        accessCookieIp.setHttpOnly(true);
+//        accessCookieIp.setSecure(false);
+//        accessCookieIp.setPath("/");
+//        accessCookieIp.setMaxAge(1000 * 60 * 30);
+//        accessCookieIp.setDomain("192.168.0.100"); // 192.168.0.100 도메인에 대한 쿠키
+//        accessCookieIp.setAttribute("SameSite", "Lax");
+//
+//        Cookie refreshCookieIp = new Cookie("refresh_token", refreshToken);
+//        refreshCookieIp.setHttpOnly(true);
+//        refreshCookieIp.setSecure(false);
+//        refreshCookieIp.setPath("/");
+//        refreshCookieIp.setMaxAge(1000 * 60 * 60 * 24 * 7);
+//        refreshCookieIp.setDomain("192.168.0.100"); // 192.168.0.100 도메인에 대한 쿠키
+//        refreshCookieIp.setAttribute("SameSite", "Lax");
+//
     }
 
     @Override

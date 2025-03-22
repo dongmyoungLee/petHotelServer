@@ -3,10 +3,9 @@ package com.example.petHotel.infrastructure.security;
 import com.example.petHotel.common.domain.dto.TokenInfo;
 import com.example.petHotel.common.domain.exception.UnauthorizedException;
 import com.example.petHotel.common.domain.service.JwtProvider;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -54,20 +53,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-//        if(tokenInfo != null
-//                && !tokenInfo.getId().toString().isEmpty() // 토큰의 ID가 비어 있지 않으면 유효한 토큰으로 간주
-//                && SecurityContextHolder.getContext().getAuthentication() == null
-//        ){
-//            UsernamePasswordAuthenticationToken authToken =
-//                    new UsernamePasswordAuthenticationToken(
-//                            tokenInfo,
-//                            null,
-//                            tokenInfo.getAuthorities()
-//                    );
-//
-//
-//            SecurityContextHolder.getContext().setAuthentication(authToken);
-//        }
-
     }
+
 }

@@ -24,16 +24,16 @@ public class UserEntity {
     @Column(name = "user_email", nullable = false, unique = true)
     private String userEmail;
 
-    @Column(name = "user_pwd", nullable = false)
+    @Column(name = "user_pwd")
     private String userPwd;
 
     @Column(name = "user_name", nullable = false)
     private String userName;
 
-    @Column(name = "user_phone", nullable = false)
+    @Column(name = "user_phone")
     private String userPhone;
 
-    @Column(name = "user_addr", nullable = false)
+    @Column(name = "user_addr")
     private String userAddr;
 
     @Column(name = "status")

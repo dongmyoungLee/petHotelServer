@@ -7,6 +7,7 @@ import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.common.mock.FakeJwtProvider;
 import com.example.petHotel.user.domain.*;
 import com.example.petHotel.user.mock.*;
+import jakarta.mail.MessagingException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,7 +73,7 @@ public class UserServiceTest {
 
 
     @Test
-    public void UserCreate를_이용하여_유저를_생성할_수_있다() {
+    public void UserCreate를_이용하여_유저를_생성할_수_있다() throws MessagingException {
         // given
         UserCreate userCreate = UserCreate.builder()
                 .userEmail("pajang1515@daum.net")

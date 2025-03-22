@@ -28,7 +28,7 @@ public class User {
     public static User from(UserCreate userCreate, UuidHolder uuidHolder, ClockHolder clockHolder, PasswordEncryption passwordEncryption) {
         return User.builder()
                 .userEmail(userCreate.getUserEmail())
-                .userPwd(passwordEncryption.encryptPassword(userCreate.getUserPwd()))
+                .userPwd(userCreate.getUserPwd().equals("sns") ? null : passwordEncryption.encryptPassword(userCreate.getUserPwd()))
                 .userName(userCreate.getUserName())
                 .userPhone(userCreate.getUserPhone())
                 .userAddr(userCreate.getUserAddr())

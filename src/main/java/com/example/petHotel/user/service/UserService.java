@@ -6,13 +6,12 @@ import com.example.petHotel.common.domain.exception.UsernameNotFoundException;
 import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.common.service.ClockHolder;
 import com.example.petHotel.common.service.UuidHolder;
-import com.example.petHotel.user.domain.User;
-import com.example.petHotel.user.domain.UserCreate;
-import com.example.petHotel.user.domain.UserStatus;
-import com.example.petHotel.user.domain.UserToken;
+import com.example.petHotel.user.domain.*;
 import com.example.petHotel.user.service.port.PasswordEncryption;
 import com.example.petHotel.user.service.port.RefreshTokenRepository;
 import com.example.petHotel.user.service.port.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.Builder;
@@ -35,6 +34,7 @@ public class UserService {
     private final PasswordEncryption passwordEncryption;
     private final CertificationService certificationService;
     private final JwtProvider jwtProvider;
+    private final KakaoUtil kakaoUtil;
 
 
     public User getById(UUID userId) {
@@ -43,7 +43,7 @@ public class UserService {
     }
 
     @Transactional
-    public User create(UserCreate userCreate) {
+    public User create(UserCreate userCreate) throws MessagingException {
         User user = User.from(userCreate, uuidHolder, clockHolder, passwordEncryption);
         user = userRepository.save(user);
         certificationService.send(userCreate.getUserEmail(), user.getUserId(), user.getCertificationCode());
@@ -96,4 +96,39 @@ public class UserService {
 
         return jwtProvider.generateAccessToken(user);
     }
+    public UserToken oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) throws JsonProcessingException {
+        KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
+        KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
+        String email = kakaoProfile.getKakao_account().getEmail();
+
+        User user = userRepository.findByUserEmail(email).orElseGet(() -> createNewUser(kakaoProfile));
+
+        String accessToken = jwtProvider.generateAccessToken(user);
+        String refreshToken = jwtProvider.generateRefreshToken(user);
+
+        return UserToken.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .role(user.getRole())
+                .id(user.getUserId())
+                .name(user.getUserName())
+                .email(user.getUserEmail())
+                .build();
+    }
+
+    private User createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
+
+        UserCreate userCreate = UserCreate.builder()
+                .userEmail(kakaoProfile.getKakao_account().getEmail())
+                .userName(kakaoProfile.getProperties().getNickname())
+                .userPwd("sns")
+                .status(UserStatus.ACTIVE)
+                .role(Role.CUSTOMER)
+                .build();
+
+        User user = User.from(userCreate, uuidHolder, clockHolder, passwordEncryption);
+
+        return userRepository.save(user);
+    }
+
 }

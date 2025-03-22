@@ -11,5 +11,3 @@ spring:
     show-sql: true
   config:
     import: secrets.yml
-
-

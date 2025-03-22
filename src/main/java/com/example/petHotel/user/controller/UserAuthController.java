@@ -19,15 +19,13 @@ import java.util.Collections;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin("http://localhost:3000, http://192.168.0.100:3000, http://192.168.0.101:3000, http://192.168.0.102:3000")
 public class UserAuthController {
     private final UserService userService;
     private final JwtProvider jwtProvider;
 
     @GetMapping("/test")
     public ResponseEntity<?> test(@CookieValue(name = "access_token", required = false) String token) {
-        System.out.println("test");
-        System.out.println(token);
         return ResponseEntity.ok(Collections.singletonMap("message", "로그아웃 되었습니다."));
     }
     @PostMapping

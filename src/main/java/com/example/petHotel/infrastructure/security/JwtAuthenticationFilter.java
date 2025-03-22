@@ -24,18 +24,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 요청이 들어올 때마다 실행 되는 필터 메서드
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("쿠키 목록:");
-
-        try {
-            for (Cookie cookie : request.getCookies()) {
-                System.out.println("쿠키 이름: " + cookie.getName() + ", 값: " + cookie.getValue());
-            }
-
-        } catch (Exception e) {
-
-        }
-
-
         String authHeader = request.getHeader("Authorization");
 
         if(authHeader == null || !authHeader.startsWith("Bearer ")){
@@ -66,4 +54,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }

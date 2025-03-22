@@ -113,6 +113,26 @@ public class JwtProviderImpl implements JwtProvider {
 
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
+//
+//
+//        // 모바일테스트
+//
+//        Cookie accessCookieIp = new Cookie("access_token", accessToken);
+//        accessCookieIp.setHttpOnly(true);
+//        accessCookieIp.setSecure(false);
+//        accessCookieIp.setPath("/");
+//        accessCookieIp.setMaxAge(1000 * 60 * 30);
+//        accessCookieIp.setDomain("192.168.0.100"); // 192.168.0.100 도메인에 대한 쿠키
+//        accessCookieIp.setAttribute("SameSite", "Lax");
+//
+//        Cookie refreshCookieIp = new Cookie("refresh_token", refreshToken);
+//        refreshCookieIp.setHttpOnly(true);
+//        refreshCookieIp.setSecure(false);
+//        refreshCookieIp.setPath("/");
+//        refreshCookieIp.setMaxAge(1000 * 60 * 60 * 24 * 7);
+//        refreshCookieIp.setDomain("192.168.0.100"); // 192.168.0.100 도메인에 대한 쿠키
+//        refreshCookieIp.setAttribute("SameSite", "Lax");
+//
     }
 
     @Override

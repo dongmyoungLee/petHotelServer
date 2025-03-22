@@ -2,11 +2,14 @@ package com.example.petHotel.user.service;
 
 import com.example.petHotel.common.domain.exception.DuplicateDataException;
 import com.example.petHotel.common.domain.exception.ResourceNotFoundException;
+import com.example.petHotel.common.domain.exception.UsernameNotFoundException;
 import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.common.service.ClockHolder;
 import com.example.petHotel.common.service.UuidHolder;
-import com.example.petHotel.user.controller.response.LoginResponse;
-import com.example.petHotel.user.domain.*;
+import com.example.petHotel.user.domain.User;
+import com.example.petHotel.user.domain.UserCreate;
+import com.example.petHotel.user.domain.UserStatus;
+import com.example.petHotel.user.domain.UserToken;
 import com.example.petHotel.user.service.port.PasswordEncryption;
 import com.example.petHotel.user.service.port.RefreshTokenRepository;
 import com.example.petHotel.user.service.port.UserRepository;
@@ -16,7 +19,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -64,7 +66,7 @@ public class UserService {
 
     public UserToken login(String email, String password) {
         User user = userRepository.findByUserEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(UsernameNotFoundException::new);
 
         if (!passwordEncryption.matches(password, user.getUserPwd())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
@@ -90,7 +92,7 @@ public class UserService {
         UUID userId = jwtProvider.getUserIdFromRefreshToken(refreshToken);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(UsernameNotFoundException::new);
 
         return jwtProvider.generateAccessToken(user);
     }

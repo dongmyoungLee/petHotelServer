@@ -1,6 +1,7 @@
 package com.example.petHotel.user.infrastructure;
 
 import com.example.petHotel.user.domain.Role;
+import com.example.petHotel.user.domain.SnsType;
 import com.example.petHotel.user.domain.User;
 import com.example.petHotel.user.domain.UserStatus;
 import jakarta.persistence.*;
@@ -50,6 +51,10 @@ public class UserEntity {
     @Column(name = "user_registration_date", nullable = false)
     private long userRegistrationDate;
 
+    @Column(name = "sns_type")
+    @Enumerated(EnumType.STRING)
+    private SnsType snsType;
+
     public User toModel() {
         return User.builder()
                 .userId(userId)
@@ -60,6 +65,7 @@ public class UserEntity {
                 .userAddr(userAddr)
                 .status(status)
                 .role(role)
+                .snsType(snsType)
                 .certificationCode(certificationCode)
                 .userRegistrationDate(userRegistrationDate)
                 .build();
@@ -74,6 +80,7 @@ public class UserEntity {
         userEntity.userPhone = user.getUserPhone();
         userEntity.userAddr = user.getUserAddr();
         userEntity.status = user.getStatus();
+        userEntity.snsType = user.getSnsType();
         userEntity.role = user.getRole();
         userEntity.certificationCode = user.getCertificationCode();
         userEntity.userRegistrationDate = user.getUserRegistrationDate();

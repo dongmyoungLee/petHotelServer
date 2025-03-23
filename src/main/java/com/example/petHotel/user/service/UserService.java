@@ -35,6 +35,7 @@ public class UserService {
     private final CertificationService certificationService;
     private final JwtProvider jwtProvider;
     private final KakaoUtil kakaoUtil;
+    private final GoogleUtil googleUtil;
 
 
     public User getById(UUID userId) {
@@ -68,6 +69,8 @@ public class UserService {
         User user = userRepository.findByUserEmail(email)
                 .orElseThrow(UsernameNotFoundException::new);
 
+        System.out.println(user);
+
         if (!passwordEncryption.matches(password, user.getUserPwd())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
@@ -96,12 +99,12 @@ public class UserService {
 
         return jwtProvider.generateAccessToken(user);
     }
-    public UserToken oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) throws JsonProcessingException {
+    public UserToken oAuthKaKaoLogin(String accessCode) throws JsonProcessingException {
         KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
         KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
         String email = kakaoProfile.getKakao_account().getEmail();
 
-        User user = userRepository.findByUserEmail(email).orElseGet(() -> createNewUser(kakaoProfile));
+        User user = userRepository.findByUserEmail(email).orElseGet(() -> createNewUser(kakaoProfile, "KAKAO"));
 
         String accessToken = jwtProvider.generateAccessToken(user);
         String refreshToken = jwtProvider.generateRefreshToken(user);
@@ -116,19 +119,59 @@ public class UserService {
                 .build();
     }
 
-    private User createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
+    private User createNewUser(Object snsProfile, String snsType) {
+        UserCreate userCreate;
 
-        UserCreate userCreate = UserCreate.builder()
-                .userEmail(kakaoProfile.getKakao_account().getEmail())
-                .userName(kakaoProfile.getProperties().getNickname())
-                .userPwd("sns")
-                .status(UserStatus.ACTIVE)
-                .role(Role.CUSTOMER)
-                .build();
+        switch (snsType) {
+            case "KAKAO":
+                KakaoDTO.KakaoProfile kakaoProfile = (KakaoDTO.KakaoProfile) snsProfile;
+                userCreate = UserCreate.builder()
+                        .userEmail(kakaoProfile.getKakao_account().getEmail())
+                        .userName(kakaoProfile.getProperties().getNickname())
+                        .userPwd("sns") // SNS 로그인용 기본 비밀번호
+                        .status(UserStatus.ACTIVE)
+                        .role(Role.CUSTOMER)
+                        .snsType(SnsType.KAKAO)
+                        .build();
+                break;
+
+            case "GOOGLE":
+                GoogleDTO.GoogleUserInfo googleUserInfo = (GoogleDTO.GoogleUserInfo) snsProfile;
+                userCreate = UserCreate.builder()
+                        .userEmail(googleUserInfo.getEmail())
+                        .userName("구글이름 가져와야함")
+                        .userPwd("sns")
+                        .status(UserStatus.ACTIVE)
+                        .role(Role.CUSTOMER)
+                        .snsType(SnsType.GOOGLE)
+                        .build();
+                break;
+
+            default:
+                throw new IllegalArgumentException("지원되지 않는 SNS 타입입니다.");
+        }
 
         User user = User.from(userCreate, uuidHolder, clockHolder, passwordEncryption);
-
         return userRepository.save(user);
     }
 
+
+    public UserToken oAuthGoogleLogin(String accessCode) {
+        GoogleDTO token = googleUtil.requestToken(accessCode);
+        GoogleDTO.GoogleUserInfo googleUserInfo = googleUtil.socialLogin(token.getAccess_token());
+
+        User user = userRepository.findByUserEmail(googleUserInfo.getEmail()).orElseGet(() -> createNewUser(googleUserInfo, "GOOGLE"));
+
+        String accessToken = jwtProvider.generateAccessToken(user);
+        String refreshToken = jwtProvider.generateRefreshToken(user);
+
+        return UserToken.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .role(user.getRole())
+                .id(user.getUserId())
+                .name(user.getUserName())
+                .email(user.getUserEmail())
+                .build();
+    }
 }

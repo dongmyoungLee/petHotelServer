@@ -5,21 +5,16 @@ import com.example.petHotel.user.controller.request.TokenValidRequest;
 import com.example.petHotel.user.controller.request.UserLoginRequest;
 import com.example.petHotel.user.controller.response.LoginResponse;
 import com.example.petHotel.user.controller.response.TokenResponse;
-import com.example.petHotel.user.domain.Role;
-import com.example.petHotel.user.domain.User;
 import com.example.petHotel.user.domain.UserToken;
 import com.example.petHotel.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -33,6 +28,7 @@ public class UserAuthController {
     public ResponseEntity<?> test(@CookieValue(name = "access_token", required = false) String token) {
         return ResponseEntity.ok(Collections.singletonMap("message", "로그아웃 되었습니다."));
     }
+
     @PostMapping
     public ResponseEntity<LoginResponse> login(@RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
 
@@ -82,11 +78,21 @@ public class UserAuthController {
 
     @GetMapping("/kakao")
     public ResponseEntity<LoginResponse> kakaoLogin(@RequestParam("code") String accessCode, HttpServletResponse response) throws JsonProcessingException {
-        UserToken userToken = userService.oAuthLogin(accessCode, response);
+        UserToken userToken = userService.oAuthKaKaoLogin(accessCode);
 
         jwtProvider.addTokenToCookies(response, userToken.getAccessToken(), userToken.getRefreshToken());
 
         return ResponseEntity.status(HttpStatus.OK).body(LoginResponse.from(userToken));
     }
+
+    @GetMapping("/google")
+    public ResponseEntity<LoginResponse> googleLogin(@RequestParam("code") String accessCode, HttpServletResponse response) throws JsonProcessingException {
+        UserToken userToken = userService.oAuthGoogleLogin(accessCode);
+
+        jwtProvider.addTokenToCookies(response, userToken.getAccessToken(), userToken.getRefreshToken());
+
+        return ResponseEntity.status(HttpStatus.OK).body(LoginResponse.from(userToken));
+    }
+
 
 }

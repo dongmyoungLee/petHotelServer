@@ -1,6 +1,7 @@
 package com.example.petHotel.user.controller.request;
 
 import com.example.petHotel.user.domain.Role;
+import com.example.petHotel.user.domain.SnsType;
 import com.example.petHotel.user.domain.UserCreate;
 import com.example.petHotel.user.domain.UserStatus;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class UserCreateRequest {
                 .userAddr(userAddr)
                 .status(status)
                 .role(role)
+                .snsType(SnsType.DEFAULT)
                 .build();
     }
 }

@@ -24,6 +24,7 @@ public class User {
     private Role role;
     private long userRegistrationDate;
     private String certificationCode;
+    private SnsType snsType;
 
     public static User from(UserCreate userCreate, UuidHolder uuidHolder, ClockHolder clockHolder, PasswordEncryption passwordEncryption) {
         return User.builder()
@@ -33,6 +34,7 @@ public class User {
                 .userPhone(userCreate.getUserPhone())
                 .userAddr(userCreate.getUserAddr())
                 .role(userCreate.getRole())
+                .snsType(userCreate.getSnsType())
                 .status(userCreate.getStatus())
                 .userRegistrationDate(clockHolder.millis())
                 .certificationCode(uuidHolder.random())

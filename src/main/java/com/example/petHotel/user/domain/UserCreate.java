@@ -13,4 +13,5 @@ public class UserCreate {
     private String userAddr;
     private UserStatus status;
     private Role role;
+    private SnsType snsType;
 }

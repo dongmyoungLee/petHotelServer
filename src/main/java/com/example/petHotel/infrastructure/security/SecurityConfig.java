@@ -40,6 +40,7 @@ public class SecurityConfig {
                         AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/users"),
                         AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/auth"),
                         AntPathRequestMatcher.antMatcher(HttpMethod.GET,"/api/v1/auth/kakao"),
+                        AntPathRequestMatcher.antMatcher(HttpMethod.GET,"/api/v1/auth/google"),
                         AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/auth/logout"),
                         AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/auth/validToken"),
                         AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/auth/refresh"),

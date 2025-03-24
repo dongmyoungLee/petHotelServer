@@ -3,7 +3,7 @@ package com.example.petHotel.common.infrastructure.jwt;
 import com.example.petHotel.common.domain.dto.TokenInfo;
 import com.example.petHotel.common.domain.exception.UnauthorizedException;
 import com.example.petHotel.common.domain.service.JwtProvider;
-import com.example.petHotel.user.domain.User;
+import com.example.petHotel.user.domain.user.User;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

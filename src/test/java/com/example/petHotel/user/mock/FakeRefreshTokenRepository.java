@@ -1,7 +1,7 @@
 package com.example.petHotel.user.mock;
 
-import com.example.petHotel.user.domain.RefreshToken;
-import com.example.petHotel.user.service.port.RefreshTokenRepository;
+import com.example.petHotel.user.domain.auth.RefreshToken;
+import com.example.petHotel.user.service.port.auth.RefreshTokenRepository;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;

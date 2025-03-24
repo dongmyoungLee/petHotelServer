@@ -1,8 +1,8 @@
 package com.example.petHotel.user.mock;
 
-import com.example.petHotel.user.domain.User;
-import com.example.petHotel.user.domain.UserStatus;
-import com.example.petHotel.user.service.port.UserRepository;
+import com.example.petHotel.user.domain.user.User;
+import com.example.petHotel.user.domain.user.UserStatus;
+import com.example.petHotel.user.service.port.user.UserRepository;
 
 import java.util.*;
 

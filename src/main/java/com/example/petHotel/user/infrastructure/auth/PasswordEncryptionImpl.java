@@ -1,11 +1,13 @@
-package com.example.petHotel.user.mock;
+package com.example.petHotel.user.infrastructure.auth;
 
 import com.example.petHotel.user.service.port.auth.PasswordEncryption;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
+@Service
 @RequiredArgsConstructor
-public class TestPasswordEncryption implements PasswordEncryption {
+public class PasswordEncryptionImpl implements PasswordEncryption {
     private final PasswordEncoder passwordEncoder;
     @Override
     public String encryptPassword(String rawPassword) {

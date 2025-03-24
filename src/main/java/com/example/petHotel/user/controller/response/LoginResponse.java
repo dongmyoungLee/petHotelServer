@@ -1,8 +1,7 @@
 package com.example.petHotel.user.controller.response;
 
-import com.example.petHotel.user.domain.Role;
-import com.example.petHotel.user.domain.User;
-import com.example.petHotel.user.domain.UserToken;
+import com.example.petHotel.user.domain.user.Role;
+import com.example.petHotel.user.domain.auth.UserToken;
 import lombok.Builder;
 import lombok.Getter;
 

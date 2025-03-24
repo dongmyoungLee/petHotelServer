@@ -2,7 +2,7 @@ package com.example.petHotel.common.mock;
 
 import com.example.petHotel.common.domain.dto.TokenInfo;
 import com.example.petHotel.common.domain.service.JwtProvider;
-import com.example.petHotel.user.domain.User;
+import com.example.petHotel.user.domain.user.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 

@@ -1,6 +1,7 @@
 package com.example.petHotel.user.service;
 
 import com.example.petHotel.user.mock.FakeMailSender;
+import com.example.petHotel.user.service.auth.CertificationService;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

@@ -56,8 +56,6 @@ public class GoogleUtil {
     public GoogleDTO.GoogleUserInfo socialLogin(String access_token) {
         String userResource = getUserResource(access_token);
 
-        System.out.println(userResource);
-
         ObjectMapper objectMapper = new ObjectMapper();
 
         GoogleDTO.GoogleUserInfo googleUserInfo = null;

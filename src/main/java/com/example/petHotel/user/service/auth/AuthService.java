@@ -1,4 +1,4 @@
-package com.example.petHotel.user.service.user;
+package com.example.petHotel.user.service.auth;
 
 import com.example.petHotel.common.domain.exception.OAuthException;
 import com.example.petHotel.common.domain.exception.UsernameNotFoundException;

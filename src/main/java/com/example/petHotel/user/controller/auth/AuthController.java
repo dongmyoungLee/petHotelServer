@@ -6,7 +6,7 @@ import com.example.petHotel.user.controller.request.UserLoginRequest;
 import com.example.petHotel.user.controller.response.LoginResponse;
 import com.example.petHotel.user.controller.response.TokenResponse;
 import com.example.petHotel.user.domain.auth.UserToken;
-import com.example.petHotel.user.service.user.AuthService;
+import com.example.petHotel.user.service.auth.AuthService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

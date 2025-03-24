@@ -1,5 +1,6 @@
 package com.example.petHotel.user.service.user;
 
+import com.example.petHotel.common.domain.exception.OAuthException;
 import com.example.petHotel.common.domain.exception.UsernameNotFoundException;
 import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.common.service.ClockHolder;
@@ -42,8 +43,6 @@ public class AuthService {
         User user = userRepository.findByUserEmail(email)
                 .orElseThrow(UsernameNotFoundException::new);
 
-        System.out.println(user);
-
         if (!passwordEncryption.matches(password, user.getUserPwd())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
@@ -74,15 +73,27 @@ public class AuthService {
     }
 
     public UserToken oAuthKaKaoLogin(String accessCode) throws JsonProcessingException {
-        return oAuthLogin(accessCode, SnsType.KAKAO);
+        try {
+            return oAuthLogin(accessCode, SnsType.KAKAO);
+        } catch (Exception e) {
+            throw new OAuthException("Kakao login failed: " + e.getMessage());
+        }
     }
 
     public UserToken oAuthGoogleLogin(String accessCode) throws JsonProcessingException {
-        return oAuthLogin(accessCode, SnsType.GOOGLE);
+        try {
+            return oAuthLogin(accessCode, SnsType.GOOGLE);
+        } catch (Exception e) {
+            throw new OAuthException("Google login failed: " + e.getMessage());
+        }
     }
 
     public UserToken oAuthNaverLogin(String accessCode) throws JsonProcessingException {
-        return oAuthLogin(accessCode, SnsType.NAVER);
+        try {
+            return oAuthLogin(accessCode, SnsType.NAVER);
+        } catch (Exception e) {
+            throw new OAuthException("Naver login failed: " + e.getMessage());
+        }
     }
 
     /**
@@ -106,7 +117,7 @@ public class AuthService {
                 GoogleDTO googleToken = googleUtil.requestToken(accessCode);
                 GoogleDTO.GoogleUserInfo googleUserInfo = googleUtil.socialLogin(googleToken.getAccess_token());
                 email = googleUserInfo.getEmail();
-                name = "구글이름 가져와야함";
+                name = googleUserInfo.getName();
                 phone = null;
                 break;
 

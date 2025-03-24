@@ -44,7 +44,6 @@ public class GoogleUtil {
 
         GoogleDTO googleToken = null;
 
-        System.out.println(response.getBody());
 
         try {
             googleToken = objectMapper.readValue(response.getBody(), GoogleDTO.class);
@@ -56,6 +55,8 @@ public class GoogleUtil {
 
     public GoogleDTO.GoogleUserInfo socialLogin(String access_token) {
         String userResource = getUserResource(access_token);
+
+        System.out.println(userResource);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -71,7 +72,7 @@ public class GoogleUtil {
     }
 
     private String getUserResource(String accessToken) {
-        String resourceUri = "https://www.googleapis.com/oauth2/v2/userinfo";
+        String resourceUri = "https://www.googleapis.com/oauth2/v3/userinfo";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);

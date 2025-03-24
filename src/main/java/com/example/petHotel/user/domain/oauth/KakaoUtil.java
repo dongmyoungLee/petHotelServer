@@ -65,7 +65,6 @@ public class KakaoUtil {
                 HttpMethod.GET,
                 kakaoProfileRequest,
                 String.class);
-        System.out.println(response2.getBody());
 
         ObjectMapper objectMapper = new ObjectMapper();
 

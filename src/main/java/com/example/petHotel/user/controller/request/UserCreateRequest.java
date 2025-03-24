@@ -1,9 +1,9 @@
 package com.example.petHotel.user.controller.request;
 
-import com.example.petHotel.user.domain.Role;
-import com.example.petHotel.user.domain.SnsType;
-import com.example.petHotel.user.domain.UserCreate;
-import com.example.petHotel.user.domain.UserStatus;
+import com.example.petHotel.user.domain.user.Role;
+import com.example.petHotel.user.domain.oauth.SnsType;
+import com.example.petHotel.user.domain.user.UserCreate;
+import com.example.petHotel.user.domain.user.UserStatus;
 import lombok.Getter;
 
 @Getter

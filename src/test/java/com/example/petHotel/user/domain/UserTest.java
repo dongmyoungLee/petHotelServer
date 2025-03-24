@@ -1,6 +1,10 @@
 package com.example.petHotel.user.domain;
 
 
+import com.example.petHotel.user.domain.user.Role;
+import com.example.petHotel.user.domain.user.User;
+import com.example.petHotel.user.domain.user.UserCreate;
+import com.example.petHotel.user.domain.user.UserStatus;
 import com.example.petHotel.user.mock.TestClockHolder;
 import com.example.petHotel.user.mock.TestPasswordEncryption;
 import com.example.petHotel.user.mock.TestUuidHolder;

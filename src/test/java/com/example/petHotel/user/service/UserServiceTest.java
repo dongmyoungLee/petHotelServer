@@ -3,10 +3,16 @@ package com.example.petHotel.user.service;
 import com.example.petHotel.common.domain.exception.CertificationCodeNotMatchedException;
 import com.example.petHotel.common.domain.exception.DuplicateDataException;
 import com.example.petHotel.common.domain.exception.ResourceNotFoundException;
-import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.common.mock.FakeJwtProvider;
-import com.example.petHotel.user.domain.*;
+import com.example.petHotel.user.domain.auth.UserToken;
+import com.example.petHotel.user.domain.user.Role;
+import com.example.petHotel.user.domain.user.User;
+import com.example.petHotel.user.domain.user.UserCreate;
+import com.example.petHotel.user.domain.user.UserStatus;
 import com.example.petHotel.user.mock.*;
+import com.example.petHotel.user.service.auth.CertificationService;
+import com.example.petHotel.user.service.user.AuthService;
+import com.example.petHotel.user.service.user.UserService;
 import jakarta.mail.MessagingException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +28,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class UserServiceTest {
     private UserService userService;
+
+    private AuthService authService;
     private FakeJwtProvider jwtProvider;
 
     @BeforeEach
@@ -153,7 +161,7 @@ public class UserServiceTest {
         String password = "1234";
 
         // when
-        UserToken userToken = userService.login(email, password);
+        UserToken userToken = authService.login(email, password);
 
         // then
         assertThat(userToken.getAccessToken()).isNotNull();
@@ -168,7 +176,7 @@ public class UserServiceTest {
         String password = "1234";
 
         // when & then
-        assertThatThrownBy(() -> userService.login(email, password))
+        assertThatThrownBy(() -> authService.login(email, password))
                 .isInstanceOf(UsernameNotFoundException.class);
     }
 
@@ -179,7 +187,7 @@ public class UserServiceTest {
         String wrongPassword = "wrong_password";
 
         // when & then
-        assertThatThrownBy(() -> userService.login(email, wrongPassword))
+        assertThatThrownBy(() -> authService.login(email, wrongPassword))
                 .isInstanceOf(BadCredentialsException.class);
     }
 
@@ -202,7 +210,7 @@ public class UserServiceTest {
         String refreshToken = jwtProvider.generateRefreshToken(user);
 
         // when
-        String newAccessToken = userService.refreshAccessToken(refreshToken, null);
+        String newAccessToken = authService.refreshAccessToken(refreshToken, null);
 
         // then
         assertThat(newAccessToken).isNotNull();
@@ -214,7 +222,7 @@ public class UserServiceTest {
         String invalidRefreshToken = "invalid_token";
 
         // when & then
-        assertThatThrownBy(() -> userService.refreshAccessToken(invalidRefreshToken, null))
+        assertThatThrownBy(() -> authService.refreshAccessToken(invalidRefreshToken, null))
                 .isInstanceOf(UsernameNotFoundException.class);
     }
 

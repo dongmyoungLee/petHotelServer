@@ -1,11 +1,10 @@
 package com.example.petHotel.user.controller.response;
 
-import com.example.petHotel.user.domain.User;
-import com.example.petHotel.user.domain.UserStatus;
+import com.example.petHotel.user.domain.user.User;
+import com.example.petHotel.user.domain.user.UserStatus;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter

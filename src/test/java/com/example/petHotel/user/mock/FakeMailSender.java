@@ -1,6 +1,6 @@
 package com.example.petHotel.user.mock;
 
-import com.example.petHotel.user.service.port.MailSender;
+import com.example.petHotel.user.service.port.auth.MailSender;
 
 public class FakeMailSender implements MailSender {
     public String email;

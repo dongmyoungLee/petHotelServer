@@ -39,6 +39,11 @@ public class UserService {
 
     @Transactional
     public User create(UserCreate userCreate) throws MessagingException {
+
+        if (userRepository.findByUserEmail(userCreate.getUserEmail()).isPresent()) {
+            throw new DuplicateDataException();
+        }
+
         User user = User.from(userCreate, uuidHolder, clockHolder, passwordEncryption);
         user = userRepository.save(user);
         certificationService.send(userCreate.getUserEmail(), user.getUserId(), user.getCertificationCode());

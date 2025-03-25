@@ -11,7 +11,7 @@ import com.example.petHotel.user.domain.user.UserCreate;
 import com.example.petHotel.user.domain.user.UserStatus;
 import com.example.petHotel.user.mock.*;
 import com.example.petHotel.user.service.auth.CertificationService;
-import com.example.petHotel.user.service.user.AuthService;
+import com.example.petHotel.user.service.auth.AuthService;
 import com.example.petHotel.user.service.user.UserService;
 import jakarta.mail.MessagingException;
 import org.assertj.core.api.Assertions;
@@ -47,7 +47,6 @@ public class UserServiceTest {
                 .clockHolder(new TestClockHolder(1678530673958L))
                 .uuidHolder(new TestUuidHolder("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))
                 .passwordEncryption(new TestPasswordEncryption(new BCryptPasswordEncoder()))
-                .jwtProvider(jwtProvider)
                 .build();
 
         User save = fakeUserRepository.save(User.builder()

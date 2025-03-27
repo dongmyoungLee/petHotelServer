@@ -1,16 +1,12 @@
 package com.example.petHotel.hotel.infrastructure;
 
 import com.example.petHotel.hotel.domain.Hotel;
-import com.example.petHotel.hotel.domain.HotelService;
-import com.example.petHotel.hotel.domain.Room;
-import com.example.petHotel.user.domain.user.User;
-import com.example.petHotel.user.infrastructure.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Builder
 @AllArgsConstructor

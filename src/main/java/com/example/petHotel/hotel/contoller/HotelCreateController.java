@@ -2,15 +2,16 @@ package com.example.petHotel.hotel.contoller;
 
 import com.example.petHotel.hotel.contoller.request.HotelCreateRequest;
 import com.example.petHotel.hotel.contoller.response.HotelCreateResponse;
+import com.example.petHotel.hotel.domain.HotelResponse;
 import com.example.petHotel.hotel.domain.Hotel;
 import com.example.petHotel.hotel.service.HotelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/hotels")
@@ -22,5 +23,11 @@ public class HotelCreateController {
     public ResponseEntity<HotelCreateResponse> createUser(@RequestBody HotelCreateRequest hotelCreateRequest) {
         Hotel hotel = hotelService.createHotel(hotelCreateRequest.to());
         return ResponseEntity.status(HttpStatus.CREATED).body(HotelCreateResponse.from(hotel));
+    }
+
+    @GetMapping("/{companyId}")
+    public ResponseEntity<List<HotelResponse>> getHotelsByCompanyId(@PathVariable UUID companyId) {
+        List<HotelResponse> hotels = hotelService.getHotelsByCompanyId(companyId);
+        return ResponseEntity.status(HttpStatus.OK).body(hotels);
     }
 }

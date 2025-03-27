@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
-public class HotelService {
+public class HotelServiceDomain {
     private UUID serviceId;
     private String serviceName;
     private String serviceDescription;
@@ -17,8 +17,8 @@ public class HotelService {
     private long hotel_service_RegistrationDate;
     private UUID hotelId;
 
-    public static HotelService from(HotelServiceCreate hotelServiceCreate, ClockHolder clockHolder) {
-        return HotelService.builder()
+    public static HotelServiceDomain from(HotelServiceCreate hotelServiceCreate, ClockHolder clockHolder) {
+        return HotelServiceDomain.builder()
                 .serviceName(hotelServiceCreate.getServiceName())
                 .serviceDescription(hotelServiceCreate.getServiceDescription())
                 .servicePrice(hotelServiceCreate.getServicePrice())

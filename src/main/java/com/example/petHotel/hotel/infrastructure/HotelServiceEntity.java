@@ -1,7 +1,6 @@
 package com.example.petHotel.hotel.infrastructure;
 
-import com.example.petHotel.hotel.domain.Hotel;
-import com.example.petHotel.hotel.domain.HotelService;
+import com.example.petHotel.hotel.domain.HotelServiceDomain;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -29,33 +28,33 @@ public class HotelServiceEntity {
     private String serviceMemo;
 
     @Column(name = "hotel_service_registration_date", nullable = false)
-    private long hotel_serivce_RegistrationDate;
+    private long hotel_service_RegistrationDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id")
     private HotelEntity hotel;
 
-    public HotelService toModel() {
-        return HotelService.builder()
+    public HotelServiceDomain toModel() {
+        return HotelServiceDomain.builder()
                 .serviceId(serviceId)
                 .serviceName(serviceName)
                 .serviceDescription(serviceDescription)
                 .servicePrice(servicePrice)
                 .serviceMemo(serviceMemo)
-                .hotel_service_RegistrationDate(hotel_serivce_RegistrationDate)
+                .hotel_service_RegistrationDate(hotel_service_RegistrationDate)
                 .hotelId(hotel.getHotelId())
                 .build();
     }
 
-    public static HotelServiceEntity fromModel(HotelService hotelService) {
+    public static HotelServiceEntity fromModel(HotelServiceDomain hotelServiceDomain) {
         HotelServiceEntity hotelServiceEntity = new HotelServiceEntity();
-        hotelServiceEntity.serviceId = hotelService.getServiceId();
-        hotelServiceEntity.serviceName = hotelService.getServiceName();
-        hotelServiceEntity.serviceDescription = hotelService.getServiceDescription();
-        hotelServiceEntity.servicePrice = hotelService.getServicePrice();
-        hotelServiceEntity.serviceMemo = hotelService.getServiceMemo();
-        hotelServiceEntity.hotel_serivce_RegistrationDate = hotelService.getHotel_service_RegistrationDate();
-        hotelServiceEntity.hotel = HotelEntity.builder().hotelId(hotelService.getHotelId()).build();
+        hotelServiceEntity.serviceId = hotelServiceDomain.getServiceId();
+        hotelServiceEntity.serviceName = hotelServiceDomain.getServiceName();
+        hotelServiceEntity.serviceDescription = hotelServiceDomain.getServiceDescription();
+        hotelServiceEntity.servicePrice = hotelServiceDomain.getServicePrice();
+        hotelServiceEntity.serviceMemo = hotelServiceDomain.getServiceMemo();
+        hotelServiceEntity.hotel_service_RegistrationDate = hotelServiceDomain.getHotel_service_RegistrationDate();
+        hotelServiceEntity.hotel = HotelEntity.builder().hotelId(hotelServiceDomain.getHotelId()).build();
         return hotelServiceEntity;
     }
 }

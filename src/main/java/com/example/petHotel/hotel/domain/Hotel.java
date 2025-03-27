@@ -1,8 +1,6 @@
 package com.example.petHotel.hotel.domain;
 
 import com.example.petHotel.common.service.ClockHolder;
-import com.example.petHotel.hotel.infrastructure.RoomEntity;
-import com.example.petHotel.user.domain.user.UserCreate;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,8 +19,8 @@ public class Hotel {
     private String hotelOwnerName;
     private String hotelProfileImg;
     private long hotelRegistrationDate;
-    private Room rooms;
-    private HotelService services;
+    private List<Room> rooms;
+    private List<HotelServiceDomain> services;
 
     public static Hotel from(HotelCreate hotelCreate, ClockHolder clockHolder) {
         return Hotel.builder()

@@ -1,12 +1,13 @@
 package com.example.petHotel.hotel.contoller.request;
 
 import com.example.petHotel.hotel.domain.HotelCreate;
-import com.example.petHotel.hotel.domain.HotelService;
+import com.example.petHotel.hotel.domain.HotelServiceDomain;
 import com.example.petHotel.hotel.domain.Room;
 import com.example.petHotel.hotel.domain.RoomStatus;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -19,8 +20,8 @@ public class HotelCreateRequest {
     private String hotelWebsite;
     private String hotelOwnerName;
     private String hotelProfileImg;
-    private RoomRequest rooms;
-    private ServiceRequest services;
+    private List<RoomRequest> rooms;
+    private List<ServiceRequest> services;
 
     @Getter
     @Builder
@@ -52,8 +53,8 @@ public class HotelCreateRequest {
         private String serviceMemo;
 
         // ServiceRequest -> HotelService 변환
-        public HotelService toEntity() {
-            return HotelService.builder()
+        public HotelServiceDomain toEntity() {
+            return HotelServiceDomain.builder()
                     .serviceName(serviceName)
                     .serviceDescription(serviceDescription)
                     .servicePrice(servicePrice)
@@ -72,8 +73,8 @@ public class HotelCreateRequest {
                 .hotelWebsite(hotelWebsite)
                 .hotelOwnerName(hotelOwnerName)
                 .hotelProfileImg(hotelProfileImg)
-                .rooms(rooms.toEntity())
-                .services(services.toEntity())
+                .rooms(rooms.stream().map(RoomRequest::toEntity).toList())
+                .services(services.stream().map(ServiceRequest::toEntity).toList())
                 .build();
     }
 }

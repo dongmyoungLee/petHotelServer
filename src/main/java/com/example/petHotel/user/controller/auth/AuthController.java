@@ -1,5 +1,6 @@
 package com.example.petHotel.user.controller.auth;
 
+import com.example.petHotel.common.domain.dto.TokenInfo;
 import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.user.controller.request.TokenValidRequest;
 import com.example.petHotel.user.controller.request.UserLoginRequest;
@@ -24,11 +25,6 @@ public class AuthController {
     private final AuthService authService;
     private final JwtProvider jwtProvider;
 
-    @GetMapping("/test")
-    public ResponseEntity<?> test(@CookieValue(name = "access_token", required = false) String token) {
-        return ResponseEntity.ok(Collections.singletonMap("message", "로그아웃 되었습니다."));
-    }
-
     @PostMapping
     public ResponseEntity<LoginResponse> login(@RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
 
@@ -37,6 +33,11 @@ public class AuthController {
         jwtProvider.addTokenToCookies(response, userToken.getAccessToken(), userToken.getRefreshToken());
 
         return ResponseEntity.status(HttpStatus.OK).body(LoginResponse.from(userToken));
+    }
+    @PostMapping("/validToken")
+    public ResponseEntity<TokenInfo> validAccessToken(@RequestBody TokenValidRequest token) {
+        TokenInfo tokenInfo = jwtProvider.parseToken(token.getToken());
+        return ResponseEntity.status(HttpStatus.OK).body(tokenInfo);
     }
 
     @PostMapping("/refresh")

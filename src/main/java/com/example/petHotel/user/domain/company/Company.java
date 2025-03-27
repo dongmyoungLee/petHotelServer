@@ -33,7 +33,7 @@ public class Company {
                 .companyEmail(companyCreate.getCompanyEmail())
                 .companyPwd(passwordEncryption.encryptPassword(companyCreate.getCompanyPwd()))
                 .companyName(companyCreate.getCompanyName())
-                .companyPhone(companyCreate.getCompanyEmail())
+                .companyPhone(companyCreate.getCompanyPhone())
                 .role(companyCreate.getRole())
                 .status(companyCreate.getStatus())
                 .companyRegistrationDate(clockHolder.millis())

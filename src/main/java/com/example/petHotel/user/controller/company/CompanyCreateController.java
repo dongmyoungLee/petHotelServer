@@ -1,4 +1,4 @@
-package com.example.petHotel.user.controller.Company;
+package com.example.petHotel.user.controller.company;
 
 import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.user.controller.request.CompanyCreateRequest;

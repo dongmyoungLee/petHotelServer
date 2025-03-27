@@ -1,10 +1,7 @@
 package com.example.petHotel.hotel.infrastructure;
 
 import com.example.petHotel.hotel.domain.Hotel;
-import com.example.petHotel.hotel.domain.HotelService;
-import com.example.petHotel.hotel.domain.Room;
 import com.example.petHotel.hotel.service.port.HotelRepository;
-import com.example.petHotel.user.infrastructure.user.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -26,9 +23,14 @@ public class HotelRepositoryImpl implements HotelRepository {
     }
 
     @Override
-    public Optional<Hotel> findByCompanyId(UUID companyId) {
-        return hotelJpaRepository.findByCompanyId(companyId).map(HotelEntity::toModel);
+    public List<Hotel> findAllByByCompanyId(UUID companyId) {
+        return hotelJpaRepository.findAllByCompanyId(companyId).stream().map(HotelEntity::toModel).toList();
     }
+
+//    @Override
+//    public List<Hotel> findAllByByCompanyId(UUID companyId) {
+//        return hotelJpaRepository.findAllByByCompanyId(companyId).stream().map(HotelEntity::toModel);
+//    }
 
     @Override
     public Hotel save(Hotel hotel) {

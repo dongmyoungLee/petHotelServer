@@ -1,7 +1,7 @@
 package com.example.petHotel.hotel.contoller.response;
 
 import com.example.petHotel.hotel.domain.Hotel;
-import com.example.petHotel.hotel.domain.HotelService;
+import com.example.petHotel.hotel.domain.HotelServiceDomain;
 import com.example.petHotel.hotel.domain.Room;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class HotelCreateResponse {
     private String hotelProfileImg;
     private long hotelRegistrationDate;
     private List<Room> rooms;
-    private List<HotelService> services;
+    private List<HotelServiceDomain> services;
 
     public static HotelCreateResponse from(Hotel hotel) {
         return HotelCreateResponse.builder()
@@ -35,6 +35,8 @@ public class HotelCreateResponse {
                 .hotelOwnerName(hotel.getHotelOwnerName())
                 .hotelProfileImg(hotel.getHotelProfileImg())
                 .hotelRegistrationDate(hotel.getHotelRegistrationDate())
+                .rooms(hotel.getRooms())
+                .services(hotel.getServices())
                 .build();
     }
 

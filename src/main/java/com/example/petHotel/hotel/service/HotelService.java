@@ -1,6 +1,7 @@
 package com.example.petHotel.hotel.service;
 
 import com.example.petHotel.common.service.ClockHolder;
+import com.example.petHotel.hotel.domain.HotelResponse;
 import com.example.petHotel.hotel.domain.*;
 import com.example.petHotel.hotel.service.port.HotelRepository;
 import com.example.petHotel.hotel.service.port.HotelServiceRepository;
@@ -11,6 +12,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Builder
@@ -20,6 +24,8 @@ public class HotelService {
     private final RoomRepository roomRepository;
     private final HotelServiceRepository hotelServiceRepository;
     private final ClockHolder clockHolder;
+    private final RoomService roomService;
+    private final HotelSvcService hotelSvcService;
 
     @Transactional
     public Hotel createHotel(HotelCreate hotelCreate) {
@@ -27,30 +33,56 @@ public class HotelService {
 
         // 호텔저장
         Hotel hotel = Hotel.from(hotelCreate, clockHolder);
-        Hotel save = hotelRepository.save(hotel);
+        Hotel savedHotel = hotelRepository.save(hotel);
 
-        // 룸 저장
-        RoomCreate roomCreate = RoomCreate.builder()
-                .roomType(hotel.getRooms().getRoomType())
-                .roomPrice(hotel.getRooms().getRoomPrice())
-                .roomStatus(hotel.getRooms().getRoomStatus())
-                .roomDescription(hotel.getRooms().getRoomDescription())
-                .dayCare(hotel.getRooms().getDayCare())
-                .hotelId(save.getHotelId())
-                .build();
-        roomRepository.save(Room.from(roomCreate, clockHolder));
+        // 객실 저장
+        roomService.saveRooms(hotelCreate.getRooms(), savedHotel.getHotelId());
 
         // 호텔 서비스 저장
-        HotelServiceCreate hotelServiceCreate = HotelServiceCreate.builder()
-                .serviceName(hotel.getServices().getServiceName())
-                .serviceDescription(hotel.getServices().getServiceDescription())
-                .servicePrice(hotel.getServices().getServicePrice())
-                .serviceMemo(hotel.getServices().getServiceMemo())
-                .hotelId(save.getHotelId())
-                .build();
-        hotelServiceRepository.save(com.example.petHotel.hotel.domain.HotelService.from(hotelServiceCreate, clockHolder));
-
+        hotelSvcService.saveServices(hotelCreate.getServices(), savedHotel.getHotelId());
 
         return hotel;
+    }
+
+    // 🚀 companyId로 Hotel 조회 (Room, Service 포함)
+    @Transactional
+    public List<HotelResponse> getHotelsByCompanyId(UUID companyId) {
+        // 1️⃣ 호텔 리스트 조회
+        List<Hotel> hotels = hotelRepository.findAllByByCompanyId(companyId);
+
+        if (hotels.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 2️⃣ 호텔 ID 리스트 추출
+        List<UUID> hotelIds = hotels.stream()
+                .map(Hotel::getHotelId)
+                .collect(Collectors.toList());
+
+        // 3️⃣ 호텔 ID 기반으로 룸 & 서비스 조회
+        Map<UUID, List<Room>> roomsByHotel = roomRepository.findByHotelIdIn(hotelIds)
+                .stream()
+                .collect(Collectors.groupingBy(Room::getHotelId));
+
+        Map<UUID, List<HotelServiceDomain>> servicesByHotel = hotelServiceRepository.findByHotelIdIn(hotelIds)
+                .stream()
+                .collect(Collectors.groupingBy(HotelServiceDomain::getHotelId));
+
+        // 4️⃣ 데이터 병합 (HotelResponse 리스트 생성)
+        return hotels.stream()
+                .map(hotel -> HotelResponse.builder()
+                        .hotelId(hotel.getHotelId())
+                        .hotelName(hotel.getHotelName())
+                        .hotelAddress(hotel.getHotelAddress())
+                        .hotelPhone(hotel.getHotelPhone())
+                        .hotelWebsite(hotel.getHotelWebsite())
+                        .hotelOwnerName(hotel.getHotelOwnerName())
+                        .hotelProfileImg(hotel.getHotelProfileImg())
+                        .rooms(roomsByHotel.getOrDefault(hotel.getHotelId(), Collections.emptyList())
+                                .stream().map(HotelResponse.RoomResponse::fromModel).collect(Collectors.toList()))
+                        .services(servicesByHotel.getOrDefault(hotel.getHotelId(), Collections.emptyList())
+                                .stream().map(HotelResponse.ServiceResponse::fromModel).collect(Collectors.toList()))
+                        .build()
+                ).collect(Collectors.toList());
     }
 }

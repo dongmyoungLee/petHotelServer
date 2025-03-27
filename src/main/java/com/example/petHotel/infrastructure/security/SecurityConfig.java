@@ -48,6 +48,7 @@ public class SecurityConfig {
                         AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/auth/validToken"),
                         AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/auth/refresh"),
                         AntPathRequestMatcher.antMatcher(HttpMethod.POST,"/api/v1/hotels"),
+                        AntPathRequestMatcher.antMatcher(HttpMethod.GET,"/api/v1/hotels/**"),
                         AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/v1/users/**/verify")
                 )
                         .permitAll()

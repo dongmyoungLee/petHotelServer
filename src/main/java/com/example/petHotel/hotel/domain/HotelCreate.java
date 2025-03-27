@@ -16,6 +16,6 @@ public class HotelCreate {
     private String hotelWebsite;
     private String hotelOwnerName;
     private String hotelProfileImg;
-    private Room rooms;
-    private HotelService services;
+    private List<Room> rooms;
+    private List<HotelServiceDomain> services;
 }

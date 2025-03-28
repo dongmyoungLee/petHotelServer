@@ -1,5 +1,6 @@
 package com.example.petHotel.hotel.service;
 
+import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.common.service.ClockHolder;
 import com.example.petHotel.hotel.domain.HotelResponse;
 import com.example.petHotel.hotel.domain.*;
@@ -26,6 +27,7 @@ public class HotelService {
     private final ClockHolder clockHolder;
     private final RoomService roomService;
     private final HotelSvcService hotelSvcService;
+    private final JwtProvider jwtProvider;
 
     @Transactional
     public Hotel createHotel(HotelCreate hotelCreate) {
@@ -46,7 +48,9 @@ public class HotelService {
 
     // 🚀 companyId로 Hotel 조회 (Room, Service 포함)
     @Transactional
-    public List<HotelResponse> getHotelsByCompanyId(UUID companyId) {
+    public List<HotelResponse> getHotelsByCompanyId(String token) {
+        UUID companyId = jwtProvider.getUserIdFromRefreshToken(token);
+
         // 1️⃣ 호텔 리스트 조회
         List<Hotel> hotels = hotelRepository.findAllByByCompanyId(companyId);
 
@@ -70,19 +74,23 @@ public class HotelService {
 
         // 4️⃣ 데이터 병합 (HotelResponse 리스트 생성)
         return hotels.stream()
-                .map(hotel -> HotelResponse.builder()
-                        .hotelId(hotel.getHotelId())
-                        .hotelName(hotel.getHotelName())
-                        .hotelAddress(hotel.getHotelAddress())
-                        .hotelPhone(hotel.getHotelPhone())
-                        .hotelWebsite(hotel.getHotelWebsite())
-                        .hotelOwnerName(hotel.getHotelOwnerName())
-                        .hotelProfileImg(hotel.getHotelProfileImg())
-                        .rooms(roomsByHotel.getOrDefault(hotel.getHotelId(), Collections.emptyList())
-                                .stream().map(HotelResponse.RoomResponse::fromModel).collect(Collectors.toList()))
-                        .services(servicesByHotel.getOrDefault(hotel.getHotelId(), Collections.emptyList())
-                                .stream().map(HotelResponse.ServiceResponse::fromModel).collect(Collectors.toList()))
-                        .build()
-                ).collect(Collectors.toList());
+                .map(hotel -> buildHotelResponse(hotel, roomsByHotel, servicesByHotel))
+                .collect(Collectors.toList());
+    }
+
+    private HotelResponse buildHotelResponse(Hotel hotel, Map<UUID, List<Room>> roomsByHotel, Map<UUID, List<HotelServiceDomain>> servicesByHotel) {
+        return HotelResponse.builder()
+                .hotelId(hotel.getHotelId())
+                .hotelName(hotel.getHotelName())
+                .hotelAddress(hotel.getHotelAddress())
+                .hotelPhone(hotel.getHotelPhone())
+                .hotelWebsite(hotel.getHotelWebsite())
+                .hotelOwnerName(hotel.getHotelOwnerName())
+                .hotelProfileImg(hotel.getHotelProfileImg())
+                .rooms(roomsByHotel.getOrDefault(hotel.getHotelId(), Collections.emptyList())
+                        .stream().map(HotelResponse.RoomResponse::fromModel).collect(Collectors.toList()))
+                .services(servicesByHotel.getOrDefault(hotel.getHotelId(), Collections.emptyList())
+                        .stream().map(HotelResponse.ServiceResponse::fromModel).collect(Collectors.toList()))
+                .build();
     }
 }

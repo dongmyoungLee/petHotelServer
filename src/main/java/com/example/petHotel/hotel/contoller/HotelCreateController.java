@@ -25,9 +25,9 @@ public class HotelCreateController {
         return ResponseEntity.status(HttpStatus.CREATED).body(HotelCreateResponse.from(hotel));
     }
 
-    @GetMapping("/{companyId}")
-    public ResponseEntity<List<HotelResponse>> getHotelsByCompanyId(@PathVariable UUID companyId) {
-        List<HotelResponse> hotels = hotelService.getHotelsByCompanyId(companyId);
+    @GetMapping("/{token}")
+    public ResponseEntity<List<HotelResponse>> getHotelsByCompanyId(@PathVariable String token) {
+        List<HotelResponse> hotels = hotelService.getHotelsByCompanyId(token);
         return ResponseEntity.status(HttpStatus.OK).body(hotels);
     }
 }

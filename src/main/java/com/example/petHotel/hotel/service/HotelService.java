@@ -81,6 +81,7 @@ public class HotelService {
     private HotelResponse buildHotelResponse(Hotel hotel, Map<UUID, List<Room>> roomsByHotel, Map<UUID, List<HotelServiceDomain>> servicesByHotel) {
         return HotelResponse.builder()
                 .hotelId(hotel.getHotelId())
+                .companyId(hotel.getCompanyId())
                 .hotelName(hotel.getHotelName())
                 .hotelAddress(hotel.getHotelAddress())
                 .hotelPhone(hotel.getHotelPhone())

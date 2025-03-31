@@ -1,6 +1,8 @@
 package com.example.petHotel.user.service.auth;
 
 import com.example.petHotel.common.domain.exception.OAuthException;
+import com.example.petHotel.common.domain.exception.ResourceNotFoundException;
+import com.example.petHotel.common.domain.exception.UnauthorizedException;
 import com.example.petHotel.common.domain.exception.UsernameNotFoundException;
 import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.common.service.ClockHolder;
@@ -41,10 +43,14 @@ public class AuthService {
 
     public UserToken login(String email, String password) {
         User user = userRepository.findByUserEmail(email)
-                .orElseThrow(UsernameNotFoundException::new);
+                .orElseThrow(() -> new UnauthorizedException("존재하는 회원이 없습니다."));
 
         if (!passwordEncryption.matches(password, user.getUserPwd())) {
-            throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
+            throw new UnauthorizedException("비밀번호가 일치하지 않습니다.");
+        }
+
+        if(user.getStatus() != UserStatus.ACTIVE) {
+            throw new UnauthorizedException("이메일 인증이 완료되지 않았습니다.");
         }
 
         String accessToken = jwtProvider.generateAccessToken(user);

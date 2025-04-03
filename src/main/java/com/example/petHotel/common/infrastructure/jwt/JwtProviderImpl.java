@@ -64,6 +64,7 @@ public class JwtProviderImpl implements JwtProvider {
      */
     @Override
     public TokenInfo parseToken(String token) {
+
         try {
             Claims body = (Claims) Jwts.parserBuilder()
                     .setSigningKey(secret.getBytes())

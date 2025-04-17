@@ -1,12 +1,16 @@
 package com.example.petHotel.hotel.service;
 
+import com.example.petHotel.common.domain.exception.ResourceNotFoundException;
 import com.example.petHotel.common.domain.service.JwtProvider;
 import com.example.petHotel.common.service.ClockHolder;
+import com.example.petHotel.hotel.contoller.request.request.HotelUpdateRequest;
 import com.example.petHotel.hotel.domain.HotelResponse;
 import com.example.petHotel.hotel.domain.*;
 import com.example.petHotel.hotel.service.port.HotelRepository;
 import com.example.petHotel.hotel.service.port.HotelServiceRepository;
 import com.example.petHotel.hotel.service.port.RoomRepository;
+import com.example.petHotel.user.domain.user.User;
+import com.example.petHotel.user.domain.user.UserStatus;
 import jakarta.transaction.Transactional;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,7 +56,7 @@ public class HotelService {
         UUID companyId = jwtProvider.getUserIdFromRefreshToken(token);
 
         // 1️⃣ 호텔 리스트 조회
-        List<Hotel> hotels = hotelRepository.findAllByByCompanyId(companyId);
+        List<Hotel> hotels = hotelRepository.findAllByCompanyId(companyId);
 
         if (hotels.isEmpty()) {
             return Collections.emptyList();
@@ -93,5 +97,19 @@ public class HotelService {
                 .services(servicesByHotel.getOrDefault(hotel.getHotelId(), Collections.emptyList())
                         .stream().map(HotelResponse.ServiceResponse::fromModel).collect(Collectors.toList()))
                 .build();
+    }
+
+    public UUID putHotelByCompanyId(HotelUpdateRequest hotelUpdateRequest) {
+        Optional<Hotel> hotel = hotelRepository.findById(hotelUpdateRequest.getHotelId());
+
+        if (hotel.isEmpty()) {
+            throw new ResourceNotFoundException("hotel not found by companyID", hotelUpdateRequest.getCompanyId());
+        }
+
+        Hotel updateDomainEntity = hotel.get().updateHotel(hotelUpdateRequest);
+
+        Hotel save = hotelRepository.save(updateDomainEntity);
+
+        return save.getHotelId();
     }
 }

@@ -5,6 +5,7 @@ import com.example.petHotel.hotel.service.port.HotelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,9 +24,10 @@ public class HotelRepositoryImpl implements HotelRepository {
     }
 
     @Override
-    public List<Hotel> findAllByByCompanyId(UUID companyId) {
+    public List<Hotel> findAllByCompanyId(UUID companyId) {
         return hotelJpaRepository.findAllByCompanyId(companyId).stream().map(HotelEntity::toModel).toList();
     }
+
 
 //    @Override
 //    public List<Hotel> findAllByByCompanyId(UUID companyId) {

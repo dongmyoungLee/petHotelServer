@@ -9,6 +9,6 @@ import java.util.UUID;
 
 public interface HotelRepository {
     Optional<Hotel> findById(UUID hotelId);
-    List<Hotel> findAllByByCompanyId(UUID companyId);
+    List<Hotel> findAllByCompanyId(UUID companyId);
     Hotel save(Hotel hotel);
 }
